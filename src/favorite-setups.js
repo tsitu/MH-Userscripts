@@ -507,32 +507,19 @@ GM_addStyle ( `
       // Main popup styling
       const mainDiv = document.createElement("div");
       mainDiv.id = "tsitu-fave-setups";
-      mainDiv.style.backgroundColor = "#F5F5F5";
-      mainDiv.style.position = "fixed";
-      mainDiv.style.zIndex = "42";
-      mainDiv.style.left = "5px";
-      mainDiv.style.top = "5px";
-      mainDiv.style.border = "solid 3px #696969";
-      mainDiv.style.borderRadius = "20px";
-      mainDiv.style.padding = "10px";
-      mainDiv.style.textAlign = "center";
 
       // Top div styling (close button, title, drag instructions)
       const topDiv = document.createElement("div");
+      topDiv.id = "header"
+      topDiv.title = "Drag header to reposition this popup";
 
       const titleSpan = document.createElement("span");
-      titleSpan.style.fontWeight = "bold";
-      titleSpan.style.fontSize = "18px";
-      titleSpan.style.textDecoration = "underline";
-      titleSpan.style.paddingLeft = "20px";
+      titleSpan.className = "title";
       titleSpan.innerText = "Favorite Setups";
-      const dragSpan = document.createElement("span");
-      dragSpan.innerText = "(Drag title to reposition this popup)";
 
       const closeButton = document.createElement("button");
-      closeButton.style.float = "right";
-      closeButton.style.fontSize = "8px";
-      closeButton.textContent = "x";
+      closeButton.id = "close-button";
+      closeButton.textContent = "×";
       closeButton.onclick = function () {
         document.body.removeChild(mainDiv);
         localStorage.setItem('showSetups', "N");
@@ -540,12 +527,11 @@ GM_addStyle ( `
 
       topDiv.appendChild(closeButton);
       topDiv.appendChild(titleSpan);
-      topDiv.appendChild(document.createElement("br"));
-      topDiv.appendChild(dragSpan);
 
       // Build <datalist> dropdowns
       const dataListTable = document.createElement("table");
-      dataListTable.style.margin = "0 auto";
+      dataListTable.id = "dataListTable";
+
       for (let rawCategory of dataKeys) {
         let category = rawCategory;
         if (category === "sort") continue;
@@ -564,9 +550,10 @@ GM_addStyle ( `
         const dataListLabel = document.createElement("label");
         dataListLabel.htmlFor = `favorite-setup-input-${category}`;
         dataListLabel.textContent = `Select ${category}: `;
-
         const dataListInput = document.createElement("input");
         dataListInput.id = `favorite-setup-input-${category}`;
+        dataListInput.className = "favInput";
+        dataListInput.setAttribute("placeholder", `Select ${category}: `);
         dataListInput.setAttribute(
           "list",
           `favorite-setup-datalist-${category}`
@@ -578,8 +565,14 @@ GM_addStyle ( `
         const inputCol = document.createElement("td");
         labelCol.appendChild(dataList);
         labelCol.appendChild(dataListLabel);
+        inputCol.className = "inputCol";
+        inputCol.appendChild(dataList);
         inputCol.appendChild(dataListInput);
         dataListRow.appendChild(labelCol);
+
+        const dataListRow = document.createElement("tr");
+        dataListRow.className = "dataListRow";
+
         dataListRow.appendChild(inputCol);
         dataListTable.appendChild(dataListRow);
       }
@@ -588,10 +581,11 @@ GM_addStyle ( `
       nameSpan.textContent = "Setup name: ";
       const nameSpanCol = document.createElement("td");
       nameSpanCol.appendChild(nameSpan);
-
       const nameInput = document.createElement("input");
       nameInput.type = "text";
       nameInput.id = "favorite-setup-name";
+      nameInput.className = "favInput";
+      nameInput.setAttribute("placeholder", "Setup name: ");
       nameInput.required = true;
       nameInput.minLength = 1;
       nameInput.maxLength = 30;
@@ -612,13 +606,15 @@ GM_addStyle ( `
       nameRow.appendChild(nameSpanCol);
       nameRow.appendChild(nameInputCol);
       dataListTable.appendChild(nameRow);
+
       const dataListDiv = document.createElement("div");
+      dataListDiv.id = "dataListDiv";
       dataListDiv.appendChild(dataListTable);
 
       // Import setup / Save setup / Reset input buttons
       const saveButton = document.createElement("button");
-      saveButton.style.fontSize = "15px";
-      saveButton.style.fontWeight = "bold";
+      saveButton.id = "saveButton";
+      saveButton.className = "button";
       saveButton.textContent = "Save Setup";
       saveButton.onclick = function () {
         const bait = document.querySelector("#favorite-setup-input-cheese")
@@ -682,7 +678,8 @@ GM_addStyle ( `
       };
 
       const loadButton = document.createElement("button");
-      loadButton.style.fontSize = "11px";
+      loadButton.id = "loadButton";
+      loadButton.className = "button";
       loadButton.textContent = "Import setup";
       loadButton.onclick = function () {
         document.querySelector("#favorite-setup-input-cheese").value =
@@ -704,7 +701,7 @@ GM_addStyle ( `
       };
 
       const resetButton = document.createElement("button");
-      resetButton.style.fontSize = "11px";
+      resetButton.className = "button";
       resetButton.textContent = "Reset inputs";
       resetButton.onclick = function () {
         document.querySelector("#favorite-setup-input-cheese").value = "";
@@ -717,17 +714,10 @@ GM_addStyle ( `
       };
 
       const buttonSpan = document.createElement("span");
-      buttonSpan.style.paddingTop = "8px";
-      buttonSpan.style.textAlign = "center";
+      buttonSpan.className = "btn-group";
       buttonSpan.appendChild(loadButton);
-      buttonSpan.appendChild(document.createTextNode("\u00A0\u00A0"));
       buttonSpan.appendChild(saveButton);
-      buttonSpan.appendChild(document.createTextNode("\u00A0\u00A0"));
       buttonSpan.appendChild(resetButton);
-
-      // Setup table styling
-      const setupTable = document.createElement("table");
-      const setupTbody = document.createElement("tbody");
 
       // Sort existing saved setups
       const savedRaw = localStorage.getItem("favorite-setups-saved");
@@ -751,6 +741,8 @@ GM_addStyle ( `
 
       const setupSelectorInput = document.createElement("input");
       setupSelectorInput.id = "favorite-setup-selector-input";
+      setupSelectorInput.className =  "favInput";
+      setupSelectorInput.setAttribute("placeholder", "Jump to setup:");
       setupSelectorInput.setAttribute("list", "favorite-setup-selector");
       setupSelectorInput.oninput = function () {
         const name = setupSelectorInput.value;
@@ -820,6 +812,10 @@ GM_addStyle ( `
 
       const scroller = document.createElement("div");
       scroller.id = "scroller";
+      // Setup table styling
+      const setupTable = document.createElement("table");
+      const setupTbody = document.createElement("tbody");
+      setupTbody.id = "setupTbody";
 
       const setupTableDiv = document.createElement("div");
       setupTableDiv.id = "setupTableDiv";
