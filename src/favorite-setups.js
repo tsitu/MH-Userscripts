@@ -50,8 +50,36 @@
     cheese: 3,
     trinket: 4,
     charm: 4,
-    skin: 5
+    skin: 5,
+    location: 6
   };
+
+  // Pull and save location list
+  const xhr = new XMLHttpRequest();
+  xhr.open(
+      "POST",
+      `https://www.mousehuntgame.com/managers/ajax/pages/page.php?page_class=HunterProfile&page_arguments%5Btab%5D=mice&page_arguments%5Bsub_tab%5D=location&uh=${user.unique_hash}`
+  );
+  xhr.onload = function () {
+      const response = JSON.parse(xhr.responseText);
+      const locations =
+            response.page.tabs.mice.subtabs[1].mouse_list.categories;
+      if (locations) {
+          const masterObj = {};
+
+          locations.forEach(el => {
+              const obj = {};
+              obj["type"] = el.type;
+              masterObj[el.name] = obj;
+          });
+
+          localStorage.setItem(
+              "ast-location-mapping",
+              JSON.stringify(masterObj)
+          );
+      };
+  };
+  xhr.send();
 
   const originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function () {
@@ -71,7 +99,8 @@
               base: {},
               weapon: {},
               trinket: {},
-              skin: {}
+              skin: {},
+              location: {}
             };
 
             data.forEach(el => {
@@ -140,8 +169,15 @@
     if (existing) existing.remove();
 
     const rawData = localStorage.getItem("tsitu-owned-components");
+    const locMap = JSON.parse(localStorage.getItem("ast-location-mapping")); // ast location mod
+    // aliases for locations with multiple environment_names for the same environment_type
+    locMap["Cursed City"] = {"type": "lost_city"};
+    locMap["Sand Crypts"] = {"type": "sand_dunes"};
+    locMap["Twisted Garden"] = {"type": "desert_oasis"};
+
     if (rawData) {
       const data = JSON.parse(rawData);
+      data.location = locMap;
       const dataKeys = Object.keys(data).sort((a, b) => {
         return displayOrder[a] - displayOrder[b];
       });
@@ -353,6 +389,7 @@
           .value;
         // const skin = document.querySelector("#favorite-setup-input-skin").value;
         const name = document.querySelector("#favorite-setup-name").value;
+        const location = document.querySelector("#favorite-setup-input-location").value;
 
         if (name.length >= 1 && name.length <= 20) {
           const obj = {};
@@ -361,7 +398,8 @@
             base: "N/A",
             weapon: "N/A",
             trinket: "N/A",
-            skin: "N/A"
+            skin: "N/A",
+            location: "N/A"
           };
 
           if (data.bait[bait] !== undefined) obj[name].bait = bait;
@@ -369,6 +407,7 @@
           if (data.weapon[weapon] !== undefined) obj[name].weapon = weapon;
           if (data.trinket[charm] !== undefined) obj[name].trinket = charm;
           // if (data.skin[skin] !== undefined) obj[name].skin = skin;
+          if (data.location[location] !== undefined) obj[name].location = location;
           obj[name].sort = -1;
 
           const storedRaw = localStorage.getItem("favorite-setups-saved");
@@ -409,6 +448,8 @@
           user.weapon_name || "";
         document.querySelector("#favorite-setup-input-charm").value =
           user.trinket_name || "";
+        document.querySelector("#favorite-setup-input-location").value =
+          user.environment_name || "";
         // if (user.skin_name) {
         //   document.querySelector("#favorite-setup-input-skin").value =
         //     user.skin_name; // not really a thing, gotta use a qS probably or parse from LS ID-name map
@@ -425,6 +466,7 @@
         document.querySelector("#favorite-setup-input-charm").value = "";
         // document.querySelector("#favorite-setup-input-skin").value = "";
         document.querySelector("#favorite-setup-name").value = "";
+        document.querySelector("#favorite-setup-input-location").value = "";
       };
 
       const buttonSpan = document.createElement("span");
@@ -630,6 +672,8 @@
             el.weapon === "N/A" ? "" : el.weapon;
           document.querySelector("#favorite-setup-input-charm").value =
             el.trinket === "N/A" ? "" : el.trinket;
+          document.querySelector("#favorite-setup-input-location").value =
+            el.location === "N/A" ? "" : el.location;
           // document.querySelector("#favorite-setup-input-skin").value =
           // el.skin === "N/A" ? "" : el.skin;
           document.querySelector("#favorite-setup-name").value = name || "";
@@ -653,6 +697,18 @@
           }
         };
 
+        const travelButton = document.createElement("button"); //ast location mod
+        travelButton.setAttribute("class","travelButton");
+        travelButton.title = "Left click to travel, Right click to update setup location to current location"
+        if (el.location) {
+            travelButton.textContent = el.location;
+        } else {
+            travelButton.textContent = 'N/A'
+        };
+        travelButton.onclick = function () {
+            app.pages.TravelPage.travel (locMap[el.location].type);
+        };
+
         const buttonCol = document.createElement("td");
         buttonCol.style.textAlign = "center";
         buttonCol.style.verticalAlign = "middle";
@@ -662,6 +718,7 @@
         buttonCol.appendChild(deleteButton);
         buttonCol.appendChild(document.createElement("br"));
         buttonCol.appendChild(armButton);
+        buttonCol.appendChild(travelButton);
 
         const setupRow = document.createElement("tr");
         setupRow.className = "tsitu-fave-setup-row";
