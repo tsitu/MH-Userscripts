@@ -403,7 +403,10 @@
           } else {
             localStorage.setItem("favorite-setups-saved", JSON.stringify(obj));
           }
+          var saveScroll = document.getElementById("scroller").scrollTop; // ast location mod
           render();
+          document.getElementById("scroller").scrollTop = saveScroll;
+          console.log("scroll position before/after: "+saveScroll+" / "+document.getElementById("scroller").scrollTop);
         } else {
           alert(
             "Please enter a name for your setup that is between 1-20 characters"
