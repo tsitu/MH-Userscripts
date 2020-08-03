@@ -613,15 +613,15 @@
         });
 
         const imgSpan = document.createElement("span");
-        imgSpan.style.paddingRight = "10px";
+        imgSpan.className = "button";
+        imgSpan.id = "imgSpan";
+
         for (let type of elKeys) {
           if (type === "sort") continue;
           if (type === "skin") continue;
           if (type === "location") continue;
 
           const img = document.createElement("img");
-          img.style.height = "40px";
-          img.style.width = "40px";
           let item = el[type];
           if (data.weapon["Golem Guardian Trap"] !== undefined) {
             if (type === "weapon") {
@@ -661,25 +661,11 @@
 
         const nameSpan = document.createElement("span");
         nameSpan.className = "tsitu-fave-setup-namespan";
-        nameSpan.style.fontSize = "14px";
         nameSpan.textContent = name;
 
-        const nameImgCol = document.createElement("td");
-        nameImgCol.style.padding = "5px 0px 5px 8px";
-        nameImgCol.appendChild(nameSpan);
-        nameImgCol.appendChild(document.createElement("br"));
-        nameImgCol.appendChild(imgSpan);
-
-        const armButton = document.createElement("button");
-        armButton.style.fontSize = "16px";
-        armButton.style.fontWeight = "bold";
-        armButton.textContent = "Arm!";
-        armButton.onclick = function () {
-          batchLoad(el.bait, el.base, el.weapon, el.trinket, el.skin);
-        };
-
         const editButton = document.createElement("button");
-        editButton.style.fontSize = "10px";
+        editButton.id = "editButton";
+        editButton.className = "button";
         editButton.textContent = "✏️";
         editButton.onclick = function () {
           document.querySelector("#favorite-setup-input-cheese").value =
@@ -701,8 +687,9 @@
         };
 
         const deleteButton = document.createElement("button");
-        deleteButton.style.fontSize = "12px";
-        deleteButton.textContent = "x";
+        deleteButton.id = "deleteButton";
+        deleteButton.className = "button";
+        deleteButton.textContent = "🗑️";
         deleteButton.onclick = function () {
           if (confirm(`Delete setup '${name}'?`)) {
             const storedRaw = localStorage.getItem("favorite-setups-saved");
@@ -722,7 +709,7 @@
         };
 
         const travelButton = document.createElement("button"); //ast location mod
-        travelButton.setAttribute("class","travelButton");
+        travelButton.className = "travelButton";
         travelButton.title = "Left click to travel, Right click to update setup location to current location"
         if (el.location) {
             travelButton.textContent = el.location;
@@ -733,21 +720,13 @@
             app.pages.TravelPage.travel (locMap[el.location].type);
         };
 
-        const buttonCol = document.createElement("td");
-        buttonCol.style.textAlign = "center";
-        buttonCol.style.verticalAlign = "middle";
-        buttonCol.style.paddingRight = "10px";
-        buttonCol.appendChild(editButton);
-        buttonCol.appendChild(document.createTextNode("\u00A0"));
-        buttonCol.appendChild(deleteButton);
-        buttonCol.appendChild(document.createElement("br"));
-        buttonCol.appendChild(armButton);
-        buttonCol.appendChild(travelButton);
-
         const setupRow = document.createElement("tr");
         setupRow.className = "tsitu-fave-setup-row";
-        setupRow.appendChild(nameImgCol);
-        setupRow.appendChild(buttonCol);
+        setupRow.appendChild(nameSpan);
+        setupRow.appendChild(travelButton);
+        setupRow.appendChild(imgSpan);
+        setupRow.appendChild(editButton);
+        setupRow.appendChild(deleteButton);
         setupTbody.appendChild(setupRow);
       }
 
