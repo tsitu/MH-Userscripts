@@ -496,15 +496,6 @@
       buttonSpan.appendChild(document.createTextNode("\u00A0\u00A0"));
       buttonSpan.appendChild(resetButton);
 
-      // Items last updated span
-      const timeUpdated = document.createElement("span");
-      let tsLatestStr = "N/A";
-      const tsLatestRaw = localStorage.getItem("favorite-setup-timestamp");
-      if (tsLatestRaw) {
-        tsLatestStr = new Date(parseInt(tsLatestRaw)).toLocaleString();
-      }
-      timeUpdated.textContent = `[Owned items last updated: ${tsLatestStr}]`;
-
       // Setup table styling
       const setupTableDiv = document.createElement("div");
       setupTableDiv.style.overflowY = "scroll";
@@ -812,21 +803,11 @@
 
       // Append everything to main popup UI
       mainDiv.appendChild(topDiv);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(dataListDiv);
-      mainDiv.appendChild(timeUpdated);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(buttonSpan);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(document.createElement("br"));
+      mainDiv.appendChild(dataListDiv);
       mainDiv.appendChild(setupSelectorDiv);
-      mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(setupTableDiv);
-      mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(toggleSort);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(sortSpan);
       document.body.appendChild(mainDiv);
       dragElement(mainDiv, topDiv);
 
