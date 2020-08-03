@@ -593,6 +593,11 @@ GM_addStyle ( `
       nameRow.appendChild(nameInputCol);
       dataListTable.appendChild(nameRow);
 
+      // Hidden checkbox to toggle dataListDiv visibility
+      const collapsibleCheckbox = document.createElement("input");
+      collapsibleCheckbox.id = "collapsible";
+      collapsibleCheckbox.type = "checkbox";
+
       const dataListDiv = document.createElement("div");
       dataListDiv.id = "dataListDiv";
       dataListDiv.appendChild(dataListTable);
@@ -658,7 +663,7 @@ GM_addStyle ( `
           console.log("scroll position before/after: "+saveScroll+" / "+document.getElementById("scroller").scrollTop);
         } else {
           alert(
-            "Please enter a name for your setup that is between 1-20 characters"
+            "Please enter a name for your setup that is between 1-30 characters"
           );
         }
       };
@@ -668,6 +673,7 @@ GM_addStyle ( `
       loadButton.className = "button";
       loadButton.textContent = "Import setup";
       loadButton.onclick = function () {
+        document.querySelector("#collapsible").checked = true; // to toggle collapsible
         document.querySelector("#favorite-setup-input-cheese").value =
           user.bait_name || "";
         document.querySelector("#favorite-setup-input-base").value =
@@ -690,6 +696,7 @@ GM_addStyle ( `
       resetButton.className = "button";
       resetButton.textContent = "Reset inputs";
       resetButton.onclick = function () {
+        document.querySelector("#collapsible").checked = false; // to toggle collapsible
         document.querySelector("#favorite-setup-input-cheese").value = "";
         document.querySelector("#favorite-setup-input-base").value = "";
         document.querySelector("#favorite-setup-input-weapon").value = "";
@@ -872,6 +879,7 @@ GM_addStyle ( `
         editButton.className = "button";
         editButton.textContent = "✏️";
         editButton.onclick = function () {
+          document.querySelector("#collapsible").checked = true;
           document.querySelector("#favorite-setup-input-cheese").value =
             el.bait === "N/A" ? "" : el.bait;
           document.querySelector("#favorite-setup-input-base").value =
