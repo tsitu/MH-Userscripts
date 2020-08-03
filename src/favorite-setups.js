@@ -170,7 +170,6 @@
 
     const rawData = localStorage.getItem("tsitu-owned-components");
     var editSort = -1; // ast location mod. change to -2 if you want new setups to appear above location sorted setups until they are manually sorted.
-
     const locMap = JSON.parse(localStorage.getItem("ast-location-mapping")); // ast location mod
     // aliases for locations with multiple environment_names for the same environment_type
     locMap["Cursed City"] = {"type": "lost_city"};
