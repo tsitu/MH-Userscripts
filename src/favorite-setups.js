@@ -670,7 +670,10 @@
                 "favorite-setups-saved",
                 JSON.stringify(storedData)
               );
-              render();
+              // to delete from DOM without a re-render
+              var i = this.parentNode.rowIndex;
+              console.log("deleted '"+name+"' from rowIndex: "+i);
+              document.getElementById("setupTbody").deleteRow(i);
             }
           }
         };
