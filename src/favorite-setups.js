@@ -268,6 +268,7 @@
       closeButton.textContent = "x";
       closeButton.onclick = function () {
         document.body.removeChild(mainDiv);
+        localStorage.setItem('showSetups', "N");
       };
 
       topDiv.appendChild(closeButton);
@@ -556,6 +557,7 @@
         for (let type of elKeys) {
           if (type === "sort") continue;
           if (type === "skin") continue;
+          if (type === "location") continue;
 
           const img = document.createElement("img");
           img.style.height = "40px";
@@ -779,8 +781,14 @@
         button.innerText = "Favorite Setups";
         button.addEventListener("click", function () {
           const existing = document.querySelector("#tsitu-fave-setups");
-          if (existing) existing.remove();
-          else render();
+          if (existing) {
+              localStorage.setItem('showSetups', "N");
+              existing.remove();
+          }
+          else {
+              localStorage.setItem('showSetups', "Y");
+              render()
+          };
         });
         button.addEventListener("contextmenu", function () {
           if (confirm("Toggle 'Favorite Setups' placement?")) {
@@ -802,8 +810,14 @@
         link.innerText = "[Favorite Setups]";
         link.addEventListener("click", function () {
           const existing = document.querySelector("#tsitu-fave-setups");
-          if (existing) existing.remove();
-          else render();
+          if (existing) {
+              localStorage.setItem('showSetups', "N"); // retain previous open/close behaviour
+              existing.remove();
+          }
+          else {
+              render();
+              localStorage.setItem('showSetups', "Y"); // retain previous open/close behaviour
+          };
           return false; // Prevent default link clicked behavior
         });
         link.addEventListener("contextmenu", function () {
@@ -818,6 +832,9 @@
       }
     }
   }
+  // retain previous open/close behaviour
+  var openedSettings = localStorage.getItem('showSetups');
+  if(openedSettings == "Y") render();
   injectUI();
 
   /**
