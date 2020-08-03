@@ -50,8 +50,10 @@
     cheese: 3,
     trinket: 4,
     charm: 4,
-    skin: 5
+    skin: 5,
+    location: 6 // ast location mod
   };
+
 
   const originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function () {
@@ -71,7 +73,8 @@
               base: {},
               weapon: {},
               trinket: {},
-              skin: {}
+              skin: {},
+              location: {}
             };
 
             data.forEach(el => {
@@ -142,6 +145,7 @@
     const rawData = localStorage.getItem("tsitu-owned-components");
     if (rawData) {
       const data = JSON.parse(rawData);
+      data.location = [];
       const dataKeys = Object.keys(data).sort((a, b) => {
         return displayOrder[a] - displayOrder[b];
       });
@@ -268,6 +272,7 @@
       closeButton.textContent = "x";
       closeButton.onclick = function () {
         document.body.removeChild(mainDiv);
+        localStorage.setItem('showSetups', "N") // retain previous open/close behaviour
       };
 
       topDiv.appendChild(closeButton);
@@ -352,6 +357,7 @@
           .value;
         // const skin = document.querySelector("#favorite-setup-input-skin").value;
         const name = document.querySelector("#favorite-setup-name").value;
+        const location = document.querySelector("#favorite-setup-input-location").value;
 
         if (name.length >= 1 && name.length <= 20) {
           const obj = {};
@@ -360,7 +366,8 @@
             base: "N/A",
             weapon: "N/A",
             trinket: "N/A",
-            skin: "N/A"
+            skin: "N/A",
+            location: "N/A"
           };
 
           if (data.bait[bait] !== undefined) obj[name].bait = bait;
@@ -369,6 +376,7 @@
           if (data.trinket[charm] !== undefined) obj[name].trinket = charm;
           // if (data.skin[skin] !== undefined) obj[name].skin = skin;
           obj[name].sort = -1;
+          if (data.location[location] !== undefined) obj[name].location = location;
 
           const storedRaw = localStorage.getItem("favorite-setups-saved");
           if (storedRaw) {
@@ -408,6 +416,7 @@
           user.weapon_name || "";
         document.querySelector("#favorite-setup-input-charm").value =
           user.trinket_name || "";
+        document.querySelector("#favorite-setup-input-location").value = user.environment_name || "";
         // if (user.skin_name) {
         //   document.querySelector("#favorite-setup-input-skin").value =
         //     user.skin_name; // not really a thing, gotta use a qS probably or parse from LS ID-name map
@@ -424,6 +433,7 @@
         document.querySelector("#favorite-setup-input-charm").value = "";
         // document.querySelector("#favorite-setup-input-skin").value = "";
         document.querySelector("#favorite-setup-name").value = "";
+        document.querySelector("#favorite-setup-input-location").value = "";
       };
 
       const buttonSpan = document.createElement("span");
@@ -556,6 +566,7 @@
         for (let type of elKeys) {
           if (type === "sort") continue;
           if (type === "skin") continue;
+          if (type === "location") continue;
 
           const img = document.createElement("img");
           img.style.height = "40px";
@@ -630,6 +641,8 @@
             el.trinket === "N/A" ? "" : el.trinket;
           // document.querySelector("#favorite-setup-input-skin").value =
           // el.skin === "N/A" ? "" : el.skin;
+          document.querySelector("#favorite-setup-input-location").value =
+              el.location === "N/A" ? "" : el.location;
           document.querySelector("#favorite-setup-name").value = name || "";
         };
 
@@ -779,8 +792,14 @@
         button.innerText = "Favorite Setups";
         button.addEventListener("click", function () {
           const existing = document.querySelector("#tsitu-fave-setups");
-          if (existing) existing.remove();
-          else render();
+          if (existing) {
+            localStorage.setItem('showSetups', "N");
+            existing.remove();
+          }
+          else {
+              localStorage.setItem('showSetups', "Y");
+              render();
+          };
         });
         button.addEventListener("contextmenu", function () {
           if (confirm("Toggle 'Favorite Setups' placement?")) {
@@ -802,8 +821,14 @@
         link.innerText = "[Favorite Setups]";
         link.addEventListener("click", function () {
           const existing = document.querySelector("#tsitu-fave-setups");
-          if (existing) existing.remove();
-          else render();
+          if (existing) {
+              localStorage.setItem('showSetups', "N"); // retain previous open/close behaviour
+              existing.remove();
+          }
+          else {
+              render();
+              localStorage.setItem('showSetups', "Y"); // retain previous open/close behaviour
+          };
           return false; // Prevent default link clicked behavior
         });
         link.addEventListener("contextmenu", function () {
@@ -818,6 +843,9 @@
       }
     }
   }
+  // retain previous open/close behaviour
+  var openedSettings = localStorage.getItem('showSetups');
+  if(openedSettings == "Y") render();
   injectUI();
 
   /**
