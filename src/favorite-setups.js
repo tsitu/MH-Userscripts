@@ -773,7 +773,7 @@
       mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(sortSpan);
       document.body.appendChild(mainDiv);
-      dragElement(mainDiv, titleSpan);
+      dragElement(mainDiv, topDiv);
 
       // Reposition popup based on previous dragged location
       const posTop = localStorage.getItem("favorite-setup-pos-top");
