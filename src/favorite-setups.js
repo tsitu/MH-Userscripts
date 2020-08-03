@@ -695,43 +695,27 @@
         setupTbody.appendChild(setupRow);
       }
 
-      // Save and reset sort buttons
-      const saveSort = document.createElement("button");
-      saveSort.innerText = "Save Sort Order";
-      saveSort.onclick = function () {
-        if (confirm("Are you sure you'd like to save this sort order?")) {
-          const storedRaw = localStorage.getItem("favorite-setups-saved");
-          if (storedRaw) {
-            const storedData = JSON.parse(storedRaw);
-            const nameSpans = document.querySelectorAll(
-              ".tsitu-fave-setup-namespan"
-            );
-            if (nameSpans.length === Object.keys(storedData).length) {
-              for (let i = 0; i < nameSpans.length; i++) {
-                const name = nameSpans[i].textContent;
-                if (storedData[name] !== undefined) {
-                  storedData[name].sort = i;
-                }
-              }
-              localStorage.setItem(
-                "favorite-setups-saved",
-                JSON.stringify(storedData)
+      // Toggle sort lock/unlock
+      const toggleSort = document.createElement("button"); // ast location mod
+      toggleSort.id = "toggleSort";
+      toggleSort.innerText = "Click to unlock drag and drop sort";// "Reset Sort Order";
+      toggleSort.onclick = function () {
+          var disabled = $(setupTbody).sortable("option", "disabled");
+          if (disabled) {
+              $(setupTbody).sortable("enable");
+              toggleSort.innerText = "Drag to sort";
+              GM_addStyle( //disable setup name selection when dragging
+                  " .tsitu-fave-setup-namespan {                    grid-area: a;                    font-size: inherit;                    text-align: left;                    text-overflow: ellipsis;                    user-select: none;}"
               );
-              render();
-            }
+          } else {
+              $(setupTbody).sortable("disable");
+              toggleSort.innerText = "Click to unlock sort";
+              GM_addStyle(
+                  " .tsitu-fave-setup-namespan {                    grid-area: a;                    font-size: inherit;                    text-align: left;                    text-overflow: ellipsis;                    user-select: text;}"
+              );
           }
-        }
       };
 
-      const resetSort = document.createElement("button");
-      resetSort.innerText = "Reset Sort Order";
-      resetSort.onclick = function () {
-        if (
-          confirm("Are you sure you'd like to reset to last saved sort order?")
-        ) {
-          render();
-        }
-      };
       const sortSpan = document.createElement("span");
       sortSpan.innerText = "Drag & drop to rearrange setup rows (PC only)";
 
@@ -742,8 +726,10 @@
       $(setupTbody).sortable({
         placeholder: "ui-state-highlight-tsitu",
         scroll: true,
-        scrollSensitivity: 20,
+        scrollSensitivity: 80,
         scrollSpeed: 20,
+        cursor: "move",
+        disabled: true,
         update: function() {
             const storedRaw = localStorage.getItem("favorite-setups-saved");
             if (storedRaw) {
@@ -783,9 +769,7 @@
       mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(setupTableDiv);
       mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(saveSort);
-      mainDiv.appendChild(document.createTextNode("\u00A0\u00A0"));
-      mainDiv.appendChild(resetSort);
+      mainDiv.appendChild(toggleSort);
       mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(sortSpan);
       document.body.appendChild(mainDiv);
