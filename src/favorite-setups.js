@@ -356,7 +356,7 @@
         // const skin = document.querySelector("#favorite-setup-input-skin").value;
         const name = document.querySelector("#favorite-setup-name").value;
 
-        if (name.length >= 1 && name.length <= 20) {
+        if (name.length >= 1 && name.length <= 30) {
           const obj = {};
           obj[name] = {
             bait: "N/A",
