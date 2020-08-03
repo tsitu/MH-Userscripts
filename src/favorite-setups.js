@@ -821,6 +821,12 @@ GM_addStyle ( `
       // TODO: [med]  Mobile UX for drag & drop as well as scrollable div (jquery-ui-touch-punch did not work for simulating touch events)
       // TODO: [low]  Skin implementation/checks (in-progress, but either save for later or scrap entirely since use case is minimal)
 
+      const scroller = document.createElement("div");
+      scroller.id = "scroller";
+
+      const setupTableDiv = document.createElement("div");
+      setupTableDiv.id = "setupTableDiv";
+
       // Generate and append each saved setup as a new <tr>
       savedSetupSortKeys.forEach(name => {
         generateRow(name);
@@ -1019,7 +1025,8 @@ GM_addStyle ( `
       mainDiv.appendChild(buttonSpan);
       mainDiv.appendChild(dataListDiv);
       mainDiv.appendChild(setupSelectorDiv);
-      mainDiv.appendChild(setupTableDiv);
+      scroller.appendChild(setupTableDiv);
+      mainDiv.appendChild(scroller);
       mainDiv.appendChild(toggleSort);
       document.body.appendChild(mainDiv);
       dragElement(mainDiv, topDiv);
