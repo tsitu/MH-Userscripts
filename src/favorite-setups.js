@@ -8,7 +8,237 @@
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
 // ==/UserScript==
+GM_addStyle ( `
+#tsitu-fave-setups {
+  background-color: #F5F5F5;
+  position: fixed;
+  z-index: 42;
+  left: 5px;
+  top: 5px;
+  border: solid 3px #696969;
+  padding: 10px;
+  text-align: center;
+  border-radius: 10px;
+  height: 95vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-size: inherit;
+  resize: both;
+  min-width: min-content;
+  min-height: 25vh;
+}
+}
+#tsitu-fave-setups button {
+	  cursor: pointer;
+}
+#tsitu-fave-setups .title {
+    font-weight: bold;
+    font-size: 160%;
+    text-decoration: underline;
+}
+#tsitu-fave-setups #close-button {
+    float: right;
+    font-size: 15px;
+    color: rgba(690,0,0,0.69);
+    padding: 1px 5px;
+    margin: -11px;
+    //background-color: rgba(420,0,0,0.420);
+    //border-radius: 0px 5px;
+    //border: none;
+}
 
+.btn-group {
+  display: inline-flex;
+  justify-content: center;
+  padding: 8px 0px;
+}
+.btn-group .button {
+  margin: -1px;
+  flex-grow: 1;
+  font-size: 100%;
+}
+#saveButton {
+  font-weight: bold;
+  font-size: 120%;
+}
+
+.favInput {
+  //display: flex;
+  //flex-grow: 1;
+  width: calc(100% - 5px*2 - 2px);
+  padding: 1px 5px;
+  //justify-content: center;
+  margin: -1px -1px;
+  font-size: 110%;
+}
+
+#collapsible {
+  display: none;
+}
+
+#dataListDiv {
+  max-height: 0px;
+  overflow-y: hidden;
+  opacity: 1;
+  transition: max-height 250ms ease-in-out, opacity 500ms;
+}
+
+#collapsible:checked + #dataListDiv {
+  max-height: 100%;
+  overflow-y: visible;
+  opacity: 1;
+}
+
+#dataListTable {
+ width: 100%;
+}
+
+.setupSelectorDiv {
+  padding-bottom: 5px;
+}
+
+#scroller {
+  /* fill parent */
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* set to some transparent color */
+  border-color: rgba(0, 0, 0, 0.0);
+  transition: border-color 300ms ease-in-out;
+  overflow: auto;
+  padding-right: 2px;
+  margin-bottom: 5px;
+}
+
+#scroller:hover {
+  /* the color we want the scrollbar on hover */
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+#scroller::-webkit-scrollbar,
+#scroller::-webkit-scrollbar-thumb,
+#scroller::-webkit-scrollbar-corner {
+  /* add border to act as background-color */
+  border-right-style: outset;
+  border-right-width: 3px;
+  /* inherit border-color to inherit transitions */
+  border-color: inherit;
+}
+#scroller::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+  border-color: rgba(0,0,0,0);
+}
+#scroller::-webkit-scrollbar-thumb {
+  border-color: inherit;
+  border-radius: 50px;
+}
+
+#scroller::-webkit-scrollbar-thumb:active {
+  border-color: rgba(0, 0, 0, 0.5);
+}
+
+// #setupTableDiv {
+//   overflow-y: scroll;
+//   max-height: 100%;
+// }
+// #setupTableDiv::-webkit-scrollbar
+// {
+//   width: 5px;
+//   background-color: #F5F5F5;
+// }
+// #setupTableDiv::-webkit-scrollbar-thumb
+// {
+//   background-color: #696969;
+//   border-radius: 420px;
+// }
+#setupTbody tr:nth-child(odd){
+  background-color: rgba(0, 0, 0, 0.25);
+}
+#setupTbody tr:nth-child(even){
+  background-color: rgba(0, 0, 0, 0.069);
+}
+.tsitu-fave-setup-row {
+    display: grid;
+    align-items: stretch;
+    grid-template-columns: 1fr auto 2em;
+    grid-template-rows: 50% 50%;
+    grid-template-areas:
+        "a c d"
+        "b c e";
+    padding: 3px;
+    border-radius: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tsitu-fave-setup-namespan {
+    grid-area: a;
+    font-size: inherit;
+    text-align: left;
+    text-overflow: ellipsis;
+    padding-top: 3px;
+    padding-left: 3px;
+    margin-right: -3px;
+}
+.travelButton {
+    grid-area: b;
+    overflow: hidden;
+    padding: 0px 2px;
+    font-size: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+}
+#imgSpan {
+  grid-area: c;
+  //align-items: center;
+  max-height: 100%;
+  max-width: max-content;
+  min-width: max-content;
+  padding: 0px 0px 0px 0px;
+  margin-left: 3px;
+  margin-right: -1px;
+  //justify-items: center;
+  overflow: hidden;
+}
+#imgSpan img {
+  max-height: 100%;
+  max-width: 100%;
+   height: 3.2vh; /* change this to change the overall size which should scale with this */
+//   width: auto;
+//   object-fit: scale-down;
+  margin-bottom: -3px;
+}
+#editButton {
+  grid-area: d;
+  text-align: center;
+  font-size: inherit;
+  padding: 0;
+  margin-bottom: -1px;
+}
+#deleteButton {
+  grid-area: e;
+  text-align: center;
+  font-size: inherit;
+  padding: 0;
+  margin-top: -1px;
+}
+#resizeButton {
+    display: flex;
+    flex-direction: right;
+    float: right;
+    font-size: 15px;
+    color: rgba(690,0,0,0.69);
+    padding: 1px 5px;
+    margin: -11px;
+    background-color: rgba(420,0,0,0.420);
+    border-radius: 5px 0px;
+    border: none;
+}
+`);
 (function () {
   // Observe Camp page for mutations (to re-inject button)
   const observerTarget = document.querySelector(".mousehuntPage-content");
@@ -169,6 +399,7 @@
     if (existing) existing.remove();
 
     const rawData = localStorage.getItem("tsitu-owned-components");
+    var editSort = -1; // ast location mod. change to -2 if you want new setups to appear above location sorted setups until they are manually sorted.
     const locMap = JSON.parse(localStorage.getItem("ast-location-mapping")); // ast location mod
     // aliases for locations with multiple environment_names for the same environment_type
     locMap["Cursed City"] = {"type": "lost_city"};
@@ -276,32 +507,19 @@
       // Main popup styling
       const mainDiv = document.createElement("div");
       mainDiv.id = "tsitu-fave-setups";
-      mainDiv.style.backgroundColor = "#F5F5F5";
-      mainDiv.style.position = "fixed";
-      mainDiv.style.zIndex = "42";
-      mainDiv.style.left = "5px";
-      mainDiv.style.top = "5px";
-      mainDiv.style.border = "solid 3px #696969";
-      mainDiv.style.borderRadius = "20px";
-      mainDiv.style.padding = "10px";
-      mainDiv.style.textAlign = "center";
 
       // Top div styling (close button, title, drag instructions)
       const topDiv = document.createElement("div");
+      topDiv.id = "header"
+      topDiv.title = "Drag header to reposition this popup";
 
       const titleSpan = document.createElement("span");
-      titleSpan.style.fontWeight = "bold";
-      titleSpan.style.fontSize = "18px";
-      titleSpan.style.textDecoration = "underline";
-      titleSpan.style.paddingLeft = "20px";
+      titleSpan.className = "title";
       titleSpan.innerText = "Favorite Setups";
-      const dragSpan = document.createElement("span");
-      dragSpan.innerText = "(Drag title to reposition this popup)";
 
       const closeButton = document.createElement("button");
-      closeButton.style.float = "right";
-      closeButton.style.fontSize = "8px";
-      closeButton.textContent = "x";
+      closeButton.id = "close-button";
+      closeButton.textContent = "×";
       closeButton.onclick = function () {
         document.body.removeChild(mainDiv);
         localStorage.setItem('showSetups', "N");
@@ -309,12 +527,11 @@
 
       topDiv.appendChild(closeButton);
       topDiv.appendChild(titleSpan);
-      topDiv.appendChild(document.createElement("br"));
-      topDiv.appendChild(dragSpan);
 
       // Build <datalist> dropdowns
       const dataListTable = document.createElement("table");
-      dataListTable.style.margin = "0 auto";
+      dataListTable.id = "dataListTable";
+
       for (let rawCategory of dataKeys) {
         let category = rawCategory;
         if (category === "sort") continue;
@@ -330,54 +547,65 @@
           dataList.appendChild(option);
         }
 
-        const dataListLabel = document.createElement("label");
-        dataListLabel.htmlFor = `favorite-setup-input-${category}`;
-        dataListLabel.textContent = `Select ${category}: `;
-
         const dataListInput = document.createElement("input");
         dataListInput.id = `favorite-setup-input-${category}`;
+        dataListInput.className = "favInput";
+        dataListInput.setAttribute("placeholder", `Select ${category}: `);
         dataListInput.setAttribute(
           "list",
           `favorite-setup-datalist-${category}`
         );
 
-        const dataListRow = document.createElement("tr");
-        const labelCol = document.createElement("td");
-        labelCol.style.paddingRight = "8px";
         const inputCol = document.createElement("td");
-        labelCol.appendChild(dataList);
-        labelCol.appendChild(dataListLabel);
+        inputCol.className = "inputCol";
+        inputCol.appendChild(dataList);
         inputCol.appendChild(dataListInput);
-        dataListRow.appendChild(labelCol);
+
+        const dataListRow = document.createElement("tr");
+        dataListRow.className = "dataListRow";
+
         dataListRow.appendChild(inputCol);
         dataListTable.appendChild(dataListRow);
       }
 
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = "Setup name: ";
-      const nameSpanCol = document.createElement("td");
-      nameSpanCol.appendChild(nameSpan);
-
       const nameInput = document.createElement("input");
       nameInput.type = "text";
       nameInput.id = "favorite-setup-name";
+      nameInput.className = "favInput";
+      nameInput.setAttribute("placeholder", "Setup name: ");
       nameInput.required = true;
       nameInput.minLength = 1;
-      nameInput.maxLength = 20;
+      nameInput.maxLength = 30;
+      nameInput.addEventListener("keyup", function(event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.keyCode === 13) {
+              // Cancel the default action, if needed
+              event.preventDefault();
+              // Trigger the button element with a click
+              document.getElementById("saveButton").click();
+          }
+      });
+
       const nameInputCol = document.createElement("td");
       nameInputCol.appendChild(nameInput);
 
       const nameRow = document.createElement("tr");
-      nameRow.appendChild(nameSpanCol);
       nameRow.appendChild(nameInputCol);
       dataListTable.appendChild(nameRow);
+
+      // Hidden checkbox to toggle dataListDiv visibility
+      const collapsibleCheckbox = document.createElement("input");
+      collapsibleCheckbox.id = "collapsible";
+      collapsibleCheckbox.type = "checkbox";
+
       const dataListDiv = document.createElement("div");
+      dataListDiv.id = "dataListDiv";
       dataListDiv.appendChild(dataListTable);
 
       // Import setup / Save setup / Reset input buttons
       const saveButton = document.createElement("button");
-      saveButton.style.fontSize = "15px";
-      saveButton.style.fontWeight = "bold";
+      saveButton.id = "saveButton";
+      saveButton.className = "button";
       saveButton.textContent = "Save Setup";
       saveButton.onclick = function () {
         const bait = document.querySelector("#favorite-setup-input-cheese")
@@ -391,7 +619,7 @@
         const name = document.querySelector("#favorite-setup-name").value;
         const location = document.querySelector("#favorite-setup-input-location").value;
 
-        if (name.length >= 1 && name.length <= 20) {
+        if (name.length >= 1 && name.length <= 30) {
           const obj = {};
           obj[name] = {
             bait: "N/A",
@@ -408,7 +636,8 @@
           if (data.trinket[charm] !== undefined) obj[name].trinket = charm;
           // if (data.skin[skin] !== undefined) obj[name].skin = skin;
           if (data.location[location] !== undefined) obj[name].location = location;
-          obj[name].sort = -1;
+          obj[name].sort = editSort;
+          console.log("saved setup '"+name+"': "+JSON.stringify(obj[name]));
 
           const storedRaw = localStorage.getItem("favorite-setups-saved");
           if (storedRaw) {
@@ -428,18 +657,23 @@
           } else {
             localStorage.setItem("favorite-setups-saved", JSON.stringify(obj));
           }
+          var saveScroll = document.getElementById("scroller").scrollTop; // ast location mod
           render();
+          document.getElementById("scroller").scrollTop = saveScroll;
+          console.log("scroll position before/after: "+saveScroll+" / "+document.getElementById("scroller").scrollTop);
         } else {
           alert(
-            "Please enter a name for your setup that is between 1-20 characters"
+            "Please enter a name for your setup that is between 1-30 characters"
           );
         }
       };
 
       const loadButton = document.createElement("button");
-      loadButton.style.fontSize = "11px";
+      loadButton.id = "loadButton";
+      loadButton.className = "button";
       loadButton.textContent = "Import setup";
       loadButton.onclick = function () {
+        document.querySelector("#collapsible").checked = true; // to toggle collapsible
         document.querySelector("#favorite-setup-input-cheese").value =
           user.bait_name || "";
         document.querySelector("#favorite-setup-input-base").value =
@@ -454,12 +688,15 @@
         //   document.querySelector("#favorite-setup-input-skin").value =
         //     user.skin_name; // not really a thing, gotta use a qS probably or parse from LS ID-name map
         // }
+        document.getElementById("favorite-setup-name").focus();
+        console.log("loaded items: ",user.bait_name, user.base_name, user.weapon_name, user.trinket_name, user.environment_name);
       };
 
       const resetButton = document.createElement("button");
-      resetButton.style.fontSize = "11px";
+      resetButton.className = "button";
       resetButton.textContent = "Reset inputs";
       resetButton.onclick = function () {
+        document.querySelector("#collapsible").checked = false; // to toggle collapsible
         document.querySelector("#favorite-setup-input-cheese").value = "";
         document.querySelector("#favorite-setup-input-base").value = "";
         document.querySelector("#favorite-setup-input-weapon").value = "";
@@ -469,30 +706,19 @@
         document.querySelector("#favorite-setup-input-location").value = "";
       };
 
+      const disarmButton = document.createElement("button");
+      disarmButton.className = "button";
+      disarmButton.textContent = "Disarm";
+      disarmButton.onclick = function () {
+          hg.utils.TrapControl.disarmBait().go();
+      };
+
       const buttonSpan = document.createElement("span");
-      buttonSpan.style.paddingTop = "8px";
-      buttonSpan.style.textAlign = "center";
+      buttonSpan.className = "btn-group";
       buttonSpan.appendChild(loadButton);
-      buttonSpan.appendChild(document.createTextNode("\u00A0\u00A0"));
       buttonSpan.appendChild(saveButton);
-      buttonSpan.appendChild(document.createTextNode("\u00A0\u00A0"));
       buttonSpan.appendChild(resetButton);
-
-      // Items last updated span
-      const timeUpdated = document.createElement("span");
-      let tsLatestStr = "N/A";
-      const tsLatestRaw = localStorage.getItem("favorite-setup-timestamp");
-      if (tsLatestRaw) {
-        tsLatestStr = new Date(parseInt(tsLatestRaw)).toLocaleString();
-      }
-      timeUpdated.textContent = `[Owned items last updated: ${tsLatestStr}]`;
-
-      // Setup table styling
-      const setupTableDiv = document.createElement("div");
-      setupTableDiv.style.overflowY = "scroll";
-      setupTableDiv.style.height = "50vh";
-      const setupTable = document.createElement("table");
-      const setupTbody = document.createElement("tbody");
+      buttonSpan.appendChild(disarmButton);
 
       // Sort existing saved setups
       const savedRaw = localStorage.getItem("favorite-setups-saved");
@@ -510,12 +736,10 @@
         setupSelector.appendChild(option);
       }
 
-      const setupSelectorLabel = document.createElement("label");
-      setupSelectorLabel.htmlFor = "favorite-setup-selector-input";
-      setupSelectorLabel.textContent = `Jump to setup: `;
-
       const setupSelectorInput = document.createElement("input");
       setupSelectorInput.id = "favorite-setup-selector-input";
+      setupSelectorInput.className =  "favInput";
+      setupSelectorInput.setAttribute("placeholder", "Jump to setup:");
       setupSelectorInput.setAttribute("list", "favorite-setup-selector");
       setupSelectorInput.oninput = function () {
         const name = setupSelectorInput.value;
@@ -572,8 +796,8 @@
       };
 
       const setupSelectorDiv = document.createElement("div");
+      setupSelectorDiv.className = "setupSelectorDiv";
       setupSelectorDiv.appendChild(setupSelector);
-      setupSelectorDiv.appendChild(setupSelectorLabel);
       setupSelectorDiv.appendChild(setupSelectorInput);
 
       // TODO: Improve async logic, probably await completion of a component switch otherwise might overlap and/or silently fail
@@ -582,6 +806,16 @@
       // ^ Profile management could be an elegant bulk grouping solution if done properly
       // TODO: [med]  Mobile UX for drag & drop as well as scrollable div (jquery-ui-touch-punch did not work for simulating touch events)
       // TODO: [low]  Skin implementation/checks (in-progress, but either save for later or scrap entirely since use case is minimal)
+
+      const scroller = document.createElement("div");
+      scroller.id = "scroller";
+      // Setup table styling
+      const setupTable = document.createElement("table");
+      const setupTbody = document.createElement("tbody");
+      setupTbody.id = "setupTbody";
+
+      const setupTableDiv = document.createElement("div");
+      setupTableDiv.id = "setupTableDiv";
 
       // Sort setups from the current location to the top of the list
       function locSort (name) {
@@ -612,16 +846,16 @@
           return displayOrder[a] - displayOrder[b];
         });
 
-        const imgSpan = document.createElement("span");
-        imgSpan.style.paddingRight = "10px";
+        const imgSpan = document.createElement("button");
+        imgSpan.className = "button";
+        imgSpan.id = "imgSpan";
+
         for (let type of elKeys) {
           if (type === "sort") continue;
           if (type === "skin") continue;
           if (type === "location") continue;
 
           const img = document.createElement("img");
-          img.style.height = "40px";
-          img.style.width = "40px";
           let item = el[type];
           if (data.weapon["Golem Guardian Trap"] !== undefined) {
             if (type === "weapon") {
@@ -657,31 +891,22 @@
             "https://www.mousehuntgame.com/images/items/stats/ee8f12ab8e042415063ef4140cefab7b.gif?cv=243";
           if (data[type][item]) img.src = data[type][item][1];
           imgSpan.appendChild(img);
-        }
+        };
+        imgSpan.onclick = function () { //ast location mod
+            batchLoad(el.bait, el.base, el.weapon, el.trinket, el.skin);
+            console.log("armed '"+name+"': ", el.bait, el.base, el.weapon, el.trinket, el.skin, el.location);
+        };
 
         const nameSpan = document.createElement("span");
         nameSpan.className = "tsitu-fave-setup-namespan";
-        nameSpan.style.fontSize = "14px";
         nameSpan.textContent = name;
 
-        const nameImgCol = document.createElement("td");
-        nameImgCol.style.padding = "5px 0px 5px 8px";
-        nameImgCol.appendChild(nameSpan);
-        nameImgCol.appendChild(document.createElement("br"));
-        nameImgCol.appendChild(imgSpan);
-
-        const armButton = document.createElement("button");
-        armButton.style.fontSize = "16px";
-        armButton.style.fontWeight = "bold";
-        armButton.textContent = "Arm!";
-        armButton.onclick = function () {
-          batchLoad(el.bait, el.base, el.weapon, el.trinket, el.skin);
-        };
-
         const editButton = document.createElement("button");
-        editButton.style.fontSize = "10px";
+        editButton.id = "editButton";
+        editButton.className = "button";
         editButton.textContent = "✏️";
         editButton.onclick = function () {
+          document.querySelector("#collapsible").checked = true;
           document.querySelector("#favorite-setup-input-cheese").value =
             el.bait === "N/A" ? "" : el.bait;
           document.querySelector("#favorite-setup-input-base").value =
@@ -695,11 +920,15 @@
           // document.querySelector("#favorite-setup-input-skin").value =
           // el.skin === "N/A" ? "" : el.skin;
           document.querySelector("#favorite-setup-name").value = name || "";
+          editSort = el.sort; // for sorting name-edited setups after the originating setup this button was clicked on
+          console.log("editing setup: "+name+" from sort position "+editSort);
+          document.getElementById("favorite-setup-name").focus(); // ast location mod
         };
 
         const deleteButton = document.createElement("button");
-        deleteButton.style.fontSize = "12px";
-        deleteButton.textContent = "x";
+        deleteButton.id = "deleteButton";
+        deleteButton.className = "button";
+        deleteButton.textContent = "🗑️";
         deleteButton.onclick = function () {
           if (confirm(`Delete setup '${name}'?`)) {
             const storedRaw = localStorage.getItem("favorite-setups-saved");
@@ -710,13 +939,16 @@
                 "favorite-setups-saved",
                 JSON.stringify(storedData)
               );
-              render();
+              // to delete from DOM without a re-render
+              var i = this.parentNode.rowIndex;
+              console.log("deleted '"+name+"' from rowIndex: "+i);
+              document.getElementById("setupTbody").deleteRow(i);
             }
           }
         };
 
         const travelButton = document.createElement("button"); //ast location mod
-        travelButton.setAttribute("class","travelButton");
+        travelButton.className = "travelButton";
         travelButton.title = "Left click to travel, Right click to update setup location to current location"
         if (el.location) {
             travelButton.textContent = el.location;
@@ -726,64 +958,92 @@
         travelButton.onclick = function () {
             app.pages.TravelPage.travel (locMap[el.location].type);
         };
+        //refresh setup with location to ease migration of old setups
+        travelButton.oncontextmenu = function() {
+            const bait = el.bait;
+            const base = el.base;
+            const weapon = el.weapon;
+            const charm = el.trinket;
+            const location = user.environment_name // ast location mod
 
-        const buttonCol = document.createElement("td");
-        buttonCol.style.textAlign = "center";
-        buttonCol.style.verticalAlign = "middle";
-        buttonCol.style.paddingRight = "10px";
-        buttonCol.appendChild(editButton);
-        buttonCol.appendChild(document.createTextNode("\u00A0"));
-        buttonCol.appendChild(deleteButton);
-        buttonCol.appendChild(document.createElement("br"));
-        buttonCol.appendChild(armButton);
-        buttonCol.appendChild(travelButton);
+            if (name.length >= 1 && name.length <= 30) {
+                const obj = {};
+                obj[name] = {
+                    bait: "N/A",
+                    base: "N/A",
+                    weapon: "N/A",
+                    trinket: "N/A",
+                    skin: "N/A"
+                    ,location: "N/A" // ast location mod
+                };
+
+                if (data.bait[bait] !== undefined) obj[name].bait = bait;
+                if (data.base[base] !== undefined) obj[name].base = base;
+                if (data.weapon[weapon] !== undefined) obj[name].weapon = weapon;
+                if (data.trinket[charm] !== undefined) obj[name].trinket = charm;
+                // if (data.skin[skin] !== undefined) obj[name].skin = skin;
+                obj[name].location = location; // ast location mod
+                obj[name].sort = editSort; // ast location mod
+                console.log("saved setup '"+name+"': "+JSON.stringify(obj[name])); // ast location mod
+
+                const storedRaw = localStorage.getItem("favorite-setups-saved");
+                if (storedRaw) {
+                    const storedData = JSON.parse(storedRaw);
+                    if (storedData[name] !== undefined) {
+                        if (confirm(`Do you want to overwrite saved setup '${name}'?`)) {
+                            obj[name].sort = storedData[name].sort;
+                        } else {
+                            return;
+                        }
+                    }
+                    storedData[name] = obj[name];
+                    localStorage.setItem(
+                        "favorite-setups-saved",
+                        JSON.stringify(storedData)
+                    );
+                } else {
+                    localStorage.setItem("favorite-setups-saved", JSON.stringify(obj));
+                }
+                var saveScroll = document.getElementById("scroller").scrollTop; // ast location mod
+                render();
+                document.getElementById("scroller").scrollTop = saveScroll;
+            } else {
+                alert(
+                    "Please enter a name for your setup that is between 1-20 characters"
+                );
+            };
+        };
 
         const setupRow = document.createElement("tr");
         setupRow.className = "tsitu-fave-setup-row";
-        setupRow.appendChild(nameImgCol);
-        setupRow.appendChild(buttonCol);
+        setupRow.appendChild(nameSpan);
+        setupRow.appendChild(travelButton);
+        setupRow.appendChild(imgSpan);
+        setupRow.appendChild(editButton);
+        setupRow.appendChild(deleteButton);
         setupTbody.appendChild(setupRow);
       }
 
-      // Save and reset sort buttons
-      const saveSort = document.createElement("button");
-      saveSort.innerText = "Save Sort Order";
-      saveSort.onclick = function () {
-        if (confirm("Are you sure you'd like to save this sort order?")) {
-          const storedRaw = localStorage.getItem("favorite-setups-saved");
-          if (storedRaw) {
-            const storedData = JSON.parse(storedRaw);
-            const nameSpans = document.querySelectorAll(
-              ".tsitu-fave-setup-namespan"
-            );
-            if (nameSpans.length === Object.keys(storedData).length) {
-              for (let i = 0; i < nameSpans.length; i++) {
-                const name = nameSpans[i].textContent;
-                if (storedData[name] !== undefined) {
-                  storedData[name].sort = i;
-                }
-              }
-              localStorage.setItem(
-                "favorite-setups-saved",
-                JSON.stringify(storedData)
+      // Toggle sort lock/unlock
+      const toggleSort = document.createElement("button"); // ast location mod
+      toggleSort.id = "toggleSort";
+      toggleSort.innerText = "Click to unlock drag and drop sort";// "Reset Sort Order";
+      toggleSort.onclick = function () {
+          var disabled = $(setupTbody).sortable("option", "disabled");
+          if (disabled) {
+              $(setupTbody).sortable("enable");
+              toggleSort.innerText = "Drag to sort";
+              GM_addStyle( //disable setup name selection when dragging
+                  " .tsitu-fave-setup-namespan {                    grid-area: a;                    font-size: inherit;                    text-align: left;                    text-overflow: ellipsis;                    user-select: none;}"
               );
-              render();
-            }
+          } else {
+              $(setupTbody).sortable("disable");
+              toggleSort.innerText = "Click to unlock sort";
+              GM_addStyle(
+                  " .tsitu-fave-setup-namespan {                    grid-area: a;                    font-size: inherit;                    text-align: left;                    text-overflow: ellipsis;                    user-select: text;}"
+              );
           }
-        }
       };
-
-      const resetSort = document.createElement("button");
-      resetSort.innerText = "Reset Sort Order";
-      resetSort.onclick = function () {
-        if (
-          confirm("Are you sure you'd like to reset to last saved sort order?")
-        ) {
-          render();
-        }
-      };
-      const sortSpan = document.createElement("span");
-      sortSpan.innerText = "Drag & drop to rearrange setup rows (PC only)";
 
       // Make the table drag & drop-able via jQuery sortable()
       GM_addStyle(
@@ -792,33 +1052,46 @@
       $(setupTbody).sortable({
         placeholder: "ui-state-highlight-tsitu",
         scroll: true,
-        scrollSensitivity: 20,
-        scrollSpeed: 20
+        scrollSensitivity: 80,
+        scrollSpeed: 20,
+        cursor: "move",
+        disabled: true,
+        update: function() {
+            const storedRaw = localStorage.getItem("favorite-setups-saved");
+            if (storedRaw) {
+                const storedData = JSON.parse(storedRaw);
+                const nameSpans = document.querySelectorAll(
+                    ".tsitu-fave-setup-namespan"
+                );
+                if (nameSpans.length === Object.keys(storedData).length) {
+                    for (let i = 0; i < nameSpans.length; i++) {
+                        const name = nameSpans[i].textContent;
+                        if (storedData[name] !== undefined) {
+                            storedData[name].sort = i;
+                        }
+                    }
+                    localStorage.setItem(
+                        "favorite-setups-saved",
+                        JSON.stringify(storedData)
+                    );
+                }
+            }
+        }
       });
       setupTable.appendChild(setupTbody);
       setupTableDiv.appendChild(setupTable);
 
       // Append everything to main popup UI
       mainDiv.appendChild(topDiv);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(dataListDiv);
-      mainDiv.appendChild(timeUpdated);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(buttonSpan);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(document.createElement("br"));
+      mainDiv.appendChild(collapsibleCheckbox);
+      mainDiv.appendChild(dataListDiv);
       mainDiv.appendChild(setupSelectorDiv);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(setupTableDiv);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(saveSort);
-      mainDiv.appendChild(document.createTextNode("\u00A0\u00A0"));
-      mainDiv.appendChild(resetSort);
-      mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(sortSpan);
+      scroller.appendChild(setupTableDiv);
+      mainDiv.appendChild(scroller);
+      mainDiv.appendChild(toggleSort);
       document.body.appendChild(mainDiv);
-      dragElement(mainDiv, titleSpan);
+      dragElement(mainDiv, topDiv);
 
       // Reposition popup based on previous dragged location
       const posTop = localStorage.getItem("favorite-setup-pos-top");
@@ -885,7 +1158,7 @@
         link.innerText = "[Favorite Setups]";
         link.addEventListener("click", function () {
           const existing = document.querySelector("#tsitu-fave-setups");
-          {
+          if (existing) {
               localStorage.setItem('showSetups', "N"); // retain previous open/close behaviour
               existing.remove();
           }
