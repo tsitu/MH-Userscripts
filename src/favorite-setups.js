@@ -706,11 +706,19 @@ GM_addStyle ( `
         document.querySelector("#favorite-setup-input-location").value = "";
       };
 
+      const disarmButton = document.createElement("button");
+      disarmButton.className = "button";
+      disarmButton.textContent = "Disarm";
+      disarmButton.onclick = function () {
+          hg.utils.TrapControl.disarmBait().go();
+      };
+
       const buttonSpan = document.createElement("span");
       buttonSpan.className = "btn-group";
       buttonSpan.appendChild(loadButton);
       buttonSpan.appendChild(saveButton);
       buttonSpan.appendChild(resetButton);
+      buttonSpan.appendChild(disarmButton);
 
       // Sort existing saved setups
       const savedRaw = localStorage.getItem("favorite-setups-saved");
