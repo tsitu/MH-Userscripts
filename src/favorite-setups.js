@@ -566,6 +566,7 @@
         for (let type of elKeys) {
           if (type === "sort") continue;
           if (type === "skin") continue;
+          if (type === "location") continue;
 
           const img = document.createElement("img");
           img.style.height = "40px";
@@ -663,6 +664,18 @@
           }
         };
 
+        const travelButton = document.createElement("button"); //ast location mod
+        travelButton.setAttribute("class","travelButton");
+        travelButton.title = "Left click to travel, Right click to update setup location to current location"
+        if (el.location) {
+            travelButton.textContent = el.location;
+        } else {
+            travelButton.textContent = 'N/A'
+        };
+        travelButton.onclick = function () {
+            app.pages.TravelPage.travel (locMap[el.location].type);
+        };
+
         const buttonCol = document.createElement("td");
         buttonCol.style.textAlign = "center";
         buttonCol.style.verticalAlign = "middle";
@@ -672,6 +685,7 @@
         buttonCol.appendChild(deleteButton);
         buttonCol.appendChild(document.createElement("br"));
         buttonCol.appendChild(armButton);
+        buttonCol.appendChild(travelButton);
 
         const setupRow = document.createElement("tr");
         setupRow.className = "tsitu-fave-setup-row";
