@@ -638,6 +638,7 @@
           // el.skin === "N/A" ? "" : el.skin;
           document.querySelector("#favorite-setup-name").value = name || "";
           editSort = el.sort; // for sorting name-edited setups after the originating setup this button was clicked on
+          console.log("editing setup: "+name+" from sort position "+editSort);
         };
 
         const deleteButton = document.createElement("button");
