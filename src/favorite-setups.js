@@ -743,7 +743,28 @@
         placeholder: "ui-state-highlight-tsitu",
         scroll: true,
         scrollSensitivity: 20,
-        scrollSpeed: 20
+        scrollSpeed: 20,
+        update: function() {
+            const storedRaw = localStorage.getItem("favorite-setups-saved");
+            if (storedRaw) {
+                const storedData = JSON.parse(storedRaw);
+                const nameSpans = document.querySelectorAll(
+                    ".tsitu-fave-setup-namespan"
+                );
+                if (nameSpans.length === Object.keys(storedData).length) {
+                    for (let i = 0; i < nameSpans.length; i++) {
+                        const name = nameSpans[i].textContent;
+                        if (storedData[name] !== undefined) {
+                            storedData[name].sort = i;
+                        }
+                    }
+                    localStorage.setItem(
+                        "favorite-setups-saved",
+                        JSON.stringify(storedData)
+                    );
+                }
+            }
+        }
       });
       setupTable.appendChild(setupTbody);
       setupTableDiv.appendChild(setupTable);
