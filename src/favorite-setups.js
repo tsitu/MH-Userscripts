@@ -817,8 +817,26 @@ GM_addStyle ( `
       const setupTableDiv = document.createElement("div");
       setupTableDiv.id = "setupTableDiv";
 
-      // Generate and append each saved setup as a new <tr>
+      // Sort setups from the current location to the top of the list
+      function locSort (name) {
+          //console.log("saved loc: "+savedSetups[name].location, "\n loc bool: "+!!savedSetups[name].location, "\n current loc: "+user.environment_name, "\n current loc bool: "+!!user.environment_name, "\n current loc is saved loc: "+(user.environment_name===savedSetups[name].location), "\n test: "+(!!savedSetups[name].location && user.environment_name == savedSetups[name].location));
+          if (user.environment_name === savedSetups[name].location) {
+              //console.log("saved loc: "+savedSetups[name].location, "\n loc bool: "+!!savedSetups[name].location, "\n current loc: "+user.environment_name, "\n current loc bool: "+!!user.environment_name, "\n current loc is saved loc: "+(user.environment_name===savedSetups[name].location), "\n test: "+(!!savedSetups[name].location && user.environment_name == savedSetups[name].location));
+              savedSetups[name].sort = -1;
+              //console.log("location sorted setup: "+savedSetups[name])
+          };
+      };
+
       savedSetupSortKeys.forEach(name => {
+          locSort(name);
+      });
+
+      const sortedSetupKeys = Object.keys(savedSetups).sort((a, b) => {
+          return savedSetups[a].sort - savedSetups[b].sort;
+      });
+
+      // Generate and append each saved setup as a new <tr>
+      sortedSetupKeys.forEach(name => {
         generateRow(name);
       });
 
