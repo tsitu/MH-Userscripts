@@ -828,7 +828,7 @@ GM_addStyle ( `
           return displayOrder[a] - displayOrder[b];
         });
 
-        const imgSpan = document.createElement("span");
+        const imgSpan = document.createElement("button");
         imgSpan.className = "button";
         imgSpan.id = "imgSpan";
 
