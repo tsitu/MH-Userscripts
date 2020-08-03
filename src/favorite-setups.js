@@ -140,6 +140,8 @@
     if (existing) existing.remove();
 
     const rawData = localStorage.getItem("tsitu-owned-components");
+    var editSort = -1; // ast location mod. change to -2 if you want new setups to appear above location sorted setups until they are manually sorted.
+
     if (rawData) {
       const data = JSON.parse(rawData);
       const dataKeys = Object.keys(data).sort((a, b) => {
@@ -369,7 +371,9 @@
           if (data.weapon[weapon] !== undefined) obj[name].weapon = weapon;
           if (data.trinket[charm] !== undefined) obj[name].trinket = charm;
           // if (data.skin[skin] !== undefined) obj[name].skin = skin;
-          obj[name].sort = -1;
+          obj[name].sort = editSort; // ast location mod
+          console.log("saved setup '"+name+"': "+JSON.stringify(obj[name])); // ast location mod
+
 
           const storedRaw = localStorage.getItem("favorite-setups-saved");
           if (storedRaw) {
@@ -633,6 +637,7 @@
           // document.querySelector("#favorite-setup-input-skin").value =
           // el.skin === "N/A" ? "" : el.skin;
           document.querySelector("#favorite-setup-name").value = name || "";
+          editSort = el.sort; // for sorting name-edited setups after the originating setup this button was clicked on
         };
 
         const deleteButton = document.createElement("button");
