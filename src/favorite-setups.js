@@ -781,6 +781,7 @@ GM_addStyle ( `
       };
 
       const setupSelectorDiv = document.createElement("div");
+      setupSelectorDiv.className = "setupSelectorDiv";
       setupSelectorDiv.appendChild(setupSelector);
       setupSelectorDiv.appendChild(setupSelectorInput);
 
