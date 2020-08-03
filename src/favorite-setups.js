@@ -54,6 +54,33 @@
     location: 6
   };
 
+  // Pull and save location list
+  const xhr = new XMLHttpRequest();
+  xhr.open(
+      "POST",
+      `https://www.mousehuntgame.com/managers/ajax/pages/page.php?page_class=HunterProfile&page_arguments%5Btab%5D=mice&page_arguments%5Bsub_tab%5D=location&uh=${user.unique_hash}`
+  );
+  xhr.onload = function () {
+      const response = JSON.parse(xhr.responseText);
+      const locations =
+            response.page.tabs.mice.subtabs[1].mouse_list.categories;
+      if (locations) {
+          const masterObj = {};
+
+          locations.forEach(el => {
+              const obj = {};
+              obj["type"] = el.type;
+              masterObj[el.name] = obj;
+          });
+
+          localStorage.setItem(
+              "ast-location-mapping",
+              JSON.stringify(masterObj)
+          );
+      };
+  };
+  xhr.send();
+
   const originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function () {
     this.addEventListener("load", function () {
@@ -142,9 +169,22 @@
     if (existing) existing.remove();
 
     const rawData = localStorage.getItem("tsitu-owned-components");
+    const locMap = JSON.parse(localStorage.getItem("ast-location-mapping")); // ast location mod
+    // aliases for locations with multiple environment_names for the same environment_type
+    locMap["Cursed City"] = {"type": "lost_city"};
+    locMap["Sand Crypts"] = {"type": "sand_dunes"};
+    locMap["Twisted Garden"] = {"type": "desert_oasis"};
+
     if (rawData) {
       const data = JSON.parse(rawData);
+<<<<<<< Updated upstream
       data.location = [];
+=======
+<<<<<<< Updated upstream
+=======
+      data.location = locMap;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
       const dataKeys = Object.keys(data).sort((a, b) => {
         return displayOrder[a] - displayOrder[b];
       });
