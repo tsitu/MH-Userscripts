@@ -557,6 +557,7 @@
         for (let type of elKeys) {
           if (type === "sort") continue;
           if (type === "skin") continue;
+          if (type === "location") continue;
 
           const img = document.createElement("img");
           img.style.height = "40px";
