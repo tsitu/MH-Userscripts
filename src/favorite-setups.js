@@ -547,9 +547,6 @@ GM_addStyle ( `
           dataList.appendChild(option);
         }
 
-        const dataListLabel = document.createElement("label");
-        dataListLabel.htmlFor = `favorite-setup-input-${category}`;
-        dataListLabel.textContent = `Select ${category}: `;
         const dataListInput = document.createElement("input");
         dataListInput.id = `favorite-setup-input-${category}`;
         dataListInput.className = "favInput";
@@ -559,16 +556,10 @@ GM_addStyle ( `
           `favorite-setup-datalist-${category}`
         );
 
-        const dataListRow = document.createElement("tr");
-        const labelCol = document.createElement("td");
-        labelCol.style.paddingRight = "8px";
         const inputCol = document.createElement("td");
-        labelCol.appendChild(dataList);
-        labelCol.appendChild(dataListLabel);
         inputCol.className = "inputCol";
         inputCol.appendChild(dataList);
         inputCol.appendChild(dataListInput);
-        dataListRow.appendChild(labelCol);
 
         const dataListRow = document.createElement("tr");
         dataListRow.className = "dataListRow";
@@ -577,10 +568,6 @@ GM_addStyle ( `
         dataListTable.appendChild(dataListRow);
       }
 
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = "Setup name: ";
-      const nameSpanCol = document.createElement("td");
-      nameSpanCol.appendChild(nameSpan);
       const nameInput = document.createElement("input");
       nameInput.type = "text";
       nameInput.id = "favorite-setup-name";
@@ -603,7 +590,6 @@ GM_addStyle ( `
       nameInputCol.appendChild(nameInput);
 
       const nameRow = document.createElement("tr");
-      nameRow.appendChild(nameSpanCol);
       nameRow.appendChild(nameInputCol);
       dataListTable.appendChild(nameRow);
 
@@ -735,10 +721,6 @@ GM_addStyle ( `
         setupSelector.appendChild(option);
       }
 
-      const setupSelectorLabel = document.createElement("label");
-      setupSelectorLabel.htmlFor = "favorite-setup-selector-input";
-      setupSelectorLabel.textContent = `Jump to setup: `;
-
       const setupSelectorInput = document.createElement("input");
       setupSelectorInput.id = "favorite-setup-selector-input";
       setupSelectorInput.className =  "favInput";
@@ -800,7 +782,6 @@ GM_addStyle ( `
 
       const setupSelectorDiv = document.createElement("div");
       setupSelectorDiv.appendChild(setupSelector);
-      setupSelectorDiv.appendChild(setupSelectorLabel);
       setupSelectorDiv.appendChild(setupSelectorInput);
 
       // TODO: Improve async logic, probably await completion of a component switch otherwise might overlap and/or silently fail
