@@ -809,7 +809,7 @@
         link.innerText = "[Favorite Setups]";
         link.addEventListener("click", function () {
           const existing = document.querySelector("#tsitu-fave-setups");
-          {
+          if (existing) {
               localStorage.setItem('showSetups', "N"); // retain previous open/close behaviour
               existing.remove();
           }
