@@ -329,7 +329,7 @@
       nameInput.id = "favorite-setup-name";
       nameInput.required = true;
       nameInput.minLength = 1;
-      nameInput.maxLength = 20;
+      nameInput.maxLength = 30;
       const nameInputCol = document.createElement("td");
       nameInputCol.appendChild(nameInput);
 
