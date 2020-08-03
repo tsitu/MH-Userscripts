@@ -638,6 +638,8 @@
             el.weapon === "N/A" ? "" : el.weapon;
           document.querySelector("#favorite-setup-input-charm").value =
             el.trinket === "N/A" ? "" : el.trinket;
+          document.querySelector("#favorite-setup-input-location").value =
+            el.location === "N/A" ? "" : el.location;
           // document.querySelector("#favorite-setup-input-skin").value =
           // el.skin === "N/A" ? "" : el.skin;
           document.querySelector("#favorite-setup-name").value = name || "";
