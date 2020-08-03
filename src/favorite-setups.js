@@ -593,6 +593,11 @@ GM_addStyle ( `
       nameRow.appendChild(nameInputCol);
       dataListTable.appendChild(nameRow);
 
+      // Hidden checkbox to toggle dataListDiv visibility
+      const collapsibleCheckbox = document.createElement("input");
+      collapsibleCheckbox.id = "collapsible";
+      collapsibleCheckbox.type = "checkbox";
+
       const dataListDiv = document.createElement("div");
       dataListDiv.id = "dataListDiv";
       dataListDiv.appendChild(dataListTable);
@@ -658,7 +663,7 @@ GM_addStyle ( `
           console.log("scroll position before/after: "+saveScroll+" / "+document.getElementById("scroller").scrollTop);
         } else {
           alert(
-            "Please enter a name for your setup that is between 1-20 characters"
+            "Please enter a name for your setup that is between 1-30 characters"
           );
         }
       };
@@ -668,6 +673,7 @@ GM_addStyle ( `
       loadButton.className = "button";
       loadButton.textContent = "Import setup";
       loadButton.onclick = function () {
+        document.querySelector("#collapsible").checked = true; // to toggle collapsible
         document.querySelector("#favorite-setup-input-cheese").value =
           user.bait_name || "";
         document.querySelector("#favorite-setup-input-base").value =
@@ -690,6 +696,7 @@ GM_addStyle ( `
       resetButton.className = "button";
       resetButton.textContent = "Reset inputs";
       resetButton.onclick = function () {
+        document.querySelector("#collapsible").checked = false; // to toggle collapsible
         document.querySelector("#favorite-setup-input-cheese").value = "";
         document.querySelector("#favorite-setup-input-base").value = "";
         document.querySelector("#favorite-setup-input-weapon").value = "";
@@ -699,11 +706,19 @@ GM_addStyle ( `
         document.querySelector("#favorite-setup-input-location").value = "";
       };
 
+      const disarmButton = document.createElement("button");
+      disarmButton.className = "button";
+      disarmButton.textContent = "Disarm";
+      disarmButton.onclick = function () {
+          hg.utils.TrapControl.disarmBait().go();
+      };
+
       const buttonSpan = document.createElement("span");
       buttonSpan.className = "btn-group";
       buttonSpan.appendChild(loadButton);
       buttonSpan.appendChild(saveButton);
       buttonSpan.appendChild(resetButton);
+      buttonSpan.appendChild(disarmButton);
 
       // Sort existing saved setups
       const savedRaw = localStorage.getItem("favorite-setups-saved");
@@ -873,6 +888,7 @@ GM_addStyle ( `
         editButton.className = "button";
         editButton.textContent = "✏️";
         editButton.onclick = function () {
+          document.querySelector("#collapsible").checked = true;
           document.querySelector("#favorite-setup-input-cheese").value =
             el.bait === "N/A" ? "" : el.bait;
           document.querySelector("#favorite-setup-input-base").value =
@@ -924,6 +940,61 @@ GM_addStyle ( `
         travelButton.onclick = function () {
             app.pages.TravelPage.travel (locMap[el.location].type);
         };
+        //refresh setup with location to ease migration of old setups
+        travelButton.oncontextmenu = function() {
+            const bait = el.bait;
+            const base = el.base;
+            const weapon = el.weapon;
+            const charm = el.trinket;
+            const location = user.environment_name // ast location mod
+
+            if (name.length >= 1 && name.length <= 30) {
+                const obj = {};
+                obj[name] = {
+                    bait: "N/A",
+                    base: "N/A",
+                    weapon: "N/A",
+                    trinket: "N/A",
+                    skin: "N/A"
+                    ,location: "N/A" // ast location mod
+                };
+
+                if (data.bait[bait] !== undefined) obj[name].bait = bait;
+                if (data.base[base] !== undefined) obj[name].base = base;
+                if (data.weapon[weapon] !== undefined) obj[name].weapon = weapon;
+                if (data.trinket[charm] !== undefined) obj[name].trinket = charm;
+                // if (data.skin[skin] !== undefined) obj[name].skin = skin;
+                obj[name].location = location; // ast location mod
+                obj[name].sort = editSort; // ast location mod
+                console.log("saved setup '"+name+"': "+JSON.stringify(obj[name])); // ast location mod
+
+                const storedRaw = localStorage.getItem("favorite-setups-saved");
+                if (storedRaw) {
+                    const storedData = JSON.parse(storedRaw);
+                    if (storedData[name] !== undefined) {
+                        if (confirm(`Do you want to overwrite saved setup '${name}'?`)) {
+                            obj[name].sort = storedData[name].sort;
+                        } else {
+                            return;
+                        }
+                    }
+                    storedData[name] = obj[name];
+                    localStorage.setItem(
+                        "favorite-setups-saved",
+                        JSON.stringify(storedData)
+                    );
+                } else {
+                    localStorage.setItem("favorite-setups-saved", JSON.stringify(obj));
+                }
+                var saveScroll = document.getElementById("scroller").scrollTop; // ast location mod
+                render();
+                document.getElementById("scroller").scrollTop = saveScroll;
+            } else {
+                alert(
+                    "Please enter a name for your setup that is between 1-20 characters"
+                );
+            };
+        };
 
         const setupRow = document.createElement("tr");
         setupRow.className = "tsitu-fave-setup-row";
@@ -955,9 +1026,6 @@ GM_addStyle ( `
               );
           }
       };
-
-      const sortSpan = document.createElement("span");
-      sortSpan.innerText = "Drag & drop to rearrange setup rows (PC only)";
 
       // Make the table drag & drop-able via jQuery sortable()
       GM_addStyle(
