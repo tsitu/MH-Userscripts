@@ -1066,6 +1066,7 @@ GM_addStyle ( `
       // Append everything to main popup UI
       mainDiv.appendChild(topDiv);
       mainDiv.appendChild(buttonSpan);
+      mainDiv.appendChild(collapsibleCheckbox);
       mainDiv.appendChild(dataListDiv);
       mainDiv.appendChild(setupSelectorDiv);
       scroller.appendChild(setupTableDiv);
