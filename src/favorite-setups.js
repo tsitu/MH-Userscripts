@@ -330,6 +330,16 @@
       nameInput.required = true;
       nameInput.minLength = 1;
       nameInput.maxLength = 30;
+      nameInput.addEventListener("keyup", function(event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.keyCode === 13) {
+              // Cancel the default action, if needed
+              event.preventDefault();
+              // Trigger the button element with a click
+              document.getElementById("saveButton").click();
+          }
+      });
+
       const nameInputCol = document.createElement("td");
       nameInputCol.appendChild(nameInput);
 
@@ -417,6 +427,8 @@
         //   document.querySelector("#favorite-setup-input-skin").value =
         //     user.skin_name; // not really a thing, gotta use a qS probably or parse from LS ID-name map
         // }
+        document.getElementById("favorite-setup-name").focus();
+        console.log("loaded items: ",user.bait_name, user.base_name, user.weapon_name, user.trinket_name, user.environment_name);
       };
 
       const resetButton = document.createElement("button");
@@ -639,6 +651,7 @@
           document.querySelector("#favorite-setup-name").value = name || "";
           editSort = el.sort; // for sorting name-edited setups after the originating setup this button was clicked on
           console.log("editing setup: "+name+" from sort position "+editSort);
+          document.getElementById("favorite-setup-name").focus(); // ast location mod
         };
 
         const deleteButton = document.createElement("button");
