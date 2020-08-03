@@ -726,9 +726,6 @@ GM_addStyle ( `
       buttonSpan.appendChild(resetButton);
 
       // Setup table styling
-      const setupTableDiv = document.createElement("div");
-      setupTableDiv.style.overflowY = "scroll";
-      setupTableDiv.style.height = "50vh";
       const setupTable = document.createElement("table");
       const setupTbody = document.createElement("tbody");
 
