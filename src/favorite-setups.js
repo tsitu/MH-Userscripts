@@ -657,11 +657,21 @@
             "https://www.mousehuntgame.com/images/items/stats/ee8f12ab8e042415063ef4140cefab7b.gif?cv=243";
           if (data[type][item]) img.src = data[type][item][1];
           imgSpan.appendChild(img);
-        }
+        };
+        imgSpan.onclick = function () { //ast location mod
+            batchLoad(el.bait, el.base, el.weapon, el.trinket, el.skin);
+            console.log("armed '"+name+"': ", el.bait, el.base, el.weapon, el.trinket, el.skin, el.location);
+        };
 
         const nameSpan = document.createElement("span");
         nameSpan.className = "tsitu-fave-setup-namespan";
         nameSpan.textContent = name;
+
+        const nameImgCol = document.createElement("td");
+        nameImgCol.style.padding = "5px 0px 5px 8px";
+        nameImgCol.appendChild(nameSpan);
+        nameImgCol.appendChild(document.createElement("br"));
+        nameImgCol.appendChild(imgSpan);
 
         const editButton = document.createElement("button");
         editButton.id = "editButton";
@@ -719,6 +729,16 @@
         travelButton.onclick = function () {
             app.pages.TravelPage.travel (locMap[el.location].type);
         };
+
+        const buttonCol = document.createElement("td");
+        buttonCol.style.textAlign = "center";
+        buttonCol.style.verticalAlign = "middle";
+        buttonCol.style.paddingRight = "10px";
+        buttonCol.appendChild(editButton);
+        buttonCol.appendChild(document.createTextNode("\u00A0"));
+        buttonCol.appendChild(deleteButton);
+        buttonCol.appendChild(document.createElement("br"));
+        buttonCol.appendChild(travelButton);
 
         const setupRow = document.createElement("tr");
         setupRow.className = "tsitu-fave-setup-row";
