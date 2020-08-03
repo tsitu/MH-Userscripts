@@ -658,12 +658,6 @@
         nameSpan.className = "tsitu-fave-setup-namespan";
         nameSpan.textContent = name;
 
-        const nameImgCol = document.createElement("td");
-        nameImgCol.style.padding = "5px 0px 5px 8px";
-        nameImgCol.appendChild(nameSpan);
-        nameImgCol.appendChild(document.createElement("br"));
-        nameImgCol.appendChild(imgSpan);
-
         const editButton = document.createElement("button");
         editButton.id = "editButton";
         editButton.className = "button";
@@ -720,16 +714,6 @@
         travelButton.onclick = function () {
             app.pages.TravelPage.travel (locMap[el.location].type);
         };
-
-        const buttonCol = document.createElement("td");
-        buttonCol.style.textAlign = "center";
-        buttonCol.style.verticalAlign = "middle";
-        buttonCol.style.paddingRight = "10px";
-        buttonCol.appendChild(editButton);
-        buttonCol.appendChild(document.createTextNode("\u00A0"));
-        buttonCol.appendChild(deleteButton);
-        buttonCol.appendChild(document.createElement("br"));
-        buttonCol.appendChild(travelButton);
 
         const setupRow = document.createElement("tr");
         setupRow.className = "tsitu-fave-setup-row";
