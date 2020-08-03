@@ -8,7 +8,237 @@
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
 // ==/UserScript==
+GM_addStyle ( `
+#tsitu-fave-setups {
+  background-color: #F5F5F5;
+  position: fixed;
+  z-index: 42;
+  left: 5px;
+  top: 5px;
+  border: solid 3px #696969;
+  padding: 10px;
+  text-align: center;
+  border-radius: 10px;
+  height: 95vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-size: inherit;
+  resize: both;
+  min-width: min-content;
+  min-height: 25vh;
+}
+}
+#tsitu-fave-setups button {
+	  cursor: pointer;
+}
+#tsitu-fave-setups .title {
+    font-weight: bold;
+    font-size: 160%;
+    text-decoration: underline;
+}
+#tsitu-fave-setups #close-button {
+    float: right;
+    font-size: 15px;
+    color: rgba(690,0,0,0.69);
+    padding: 1px 5px;
+    margin: -11px;
+    //background-color: rgba(420,0,0,0.420);
+    //border-radius: 0px 5px;
+    //border: none;
+}
 
+.btn-group {
+  display: inline-flex;
+  justify-content: center;
+  padding: 8px 0px;
+}
+.btn-group .button {
+  margin: -1px;
+  flex-grow: 1;
+  font-size: 100%;
+}
+#saveButton {
+  font-weight: bold;
+  font-size: 120%;
+}
+
+.favInput {
+  //display: flex;
+  //flex-grow: 1;
+  width: calc(100% - 5px*2 - 2px);
+  padding: 1px 5px;
+  //justify-content: center;
+  margin: -1px -1px;
+  font-size: 110%;
+}
+
+#collapsible {
+  display: none;
+}
+
+#dataListDiv {
+  max-height: 0px;
+  overflow-y: hidden;
+  opacity: 1;
+  transition: max-height 250ms ease-in-out, opacity 500ms;
+}
+
+#collapsible:checked + #dataListDiv {
+  max-height: 100%;
+  overflow-y: visible;
+  opacity: 1;
+}
+
+#dataListTable {
+ width: 100%;
+}
+
+.setupSelectorDiv {
+  padding-bottom: 5px;
+}
+
+#scroller {
+  /* fill parent */
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* set to some transparent color */
+  border-color: rgba(0, 0, 0, 0.0);
+  transition: border-color 300ms ease-in-out;
+  overflow: auto;
+  padding-right: 2px;
+  margin-bottom: 5px;
+}
+
+#scroller:hover {
+  /* the color we want the scrollbar on hover */
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+#scroller::-webkit-scrollbar,
+#scroller::-webkit-scrollbar-thumb,
+#scroller::-webkit-scrollbar-corner {
+  /* add border to act as background-color */
+  border-right-style: outset;
+  border-right-width: 3px;
+  /* inherit border-color to inherit transitions */
+  border-color: inherit;
+}
+#scroller::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+  border-color: rgba(0,0,0,0);
+}
+#scroller::-webkit-scrollbar-thumb {
+  border-color: inherit;
+  border-radius: 50px;
+}
+
+#scroller::-webkit-scrollbar-thumb:active {
+  border-color: rgba(0, 0, 0, 0.5);
+}
+
+// #setupTableDiv {
+//   overflow-y: scroll;
+//   max-height: 100%;
+// }
+// #setupTableDiv::-webkit-scrollbar
+// {
+//   width: 5px;
+//   background-color: #F5F5F5;
+// }
+// #setupTableDiv::-webkit-scrollbar-thumb
+// {
+//   background-color: #696969;
+//   border-radius: 420px;
+// }
+#setupTbody tr:nth-child(odd){
+  background-color: rgba(0, 0, 0, 0.25);
+}
+#setupTbody tr:nth-child(even){
+  background-color: rgba(0, 0, 0, 0.069);
+}
+.tsitu-fave-setup-row {
+    display: grid;
+    align-items: stretch;
+    grid-template-columns: 1fr auto 2em;
+    grid-template-rows: 50% 50%;
+    grid-template-areas:
+        "a c d"
+        "b c e";
+    padding: 3px;
+    border-radius: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tsitu-fave-setup-namespan {
+    grid-area: a;
+    font-size: inherit;
+    text-align: left;
+    text-overflow: ellipsis;
+    padding-top: 3px;
+    padding-left: 3px;
+    margin-right: -3px;
+}
+.travelButton {
+    grid-area: b;
+    overflow: hidden;
+    padding: 0px 2px;
+    font-size: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+}
+#imgSpan {
+  grid-area: c;
+  //align-items: center;
+  max-height: 100%;
+  max-width: max-content;
+  min-width: max-content;
+  padding: 0px 0px 0px 0px;
+  margin-left: 3px;
+  margin-right: -1px;
+  //justify-items: center;
+  overflow: hidden;
+}
+#imgSpan img {
+  max-height: 100%;
+  max-width: 100%;
+   height: 3.2vh; /* change this to change the overall size which should scale with this */
+//   width: auto;
+//   object-fit: scale-down;
+  margin-bottom: -3px;
+}
+#editButton {
+  grid-area: d;
+  text-align: center;
+  font-size: inherit;
+  padding: 0;
+  margin-bottom: -1px;
+}
+#deleteButton {
+  grid-area: e;
+  text-align: center;
+  font-size: inherit;
+  padding: 0;
+  margin-top: -1px;
+}
+#resizeButton {
+    display: flex;
+    flex-direction: right;
+    float: right;
+    font-size: 15px;
+    color: rgba(690,0,0,0.69);
+    padding: 1px 5px;
+    margin: -11px;
+    background-color: rgba(420,0,0,0.420);
+    border-radius: 5px 0px;
+    border: none;
+}
+`);
 (function () {
   // Observe Camp page for mutations (to re-inject button)
   const observerTarget = document.querySelector(".mousehuntPage-content");
