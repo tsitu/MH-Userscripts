@@ -177,14 +177,7 @@
 
     if (rawData) {
       const data = JSON.parse(rawData);
-<<<<<<< Updated upstream
-      data.location = [];
-=======
-<<<<<<< Updated upstream
-=======
       data.location = locMap;
->>>>>>> Stashed changes
->>>>>>> Stashed changes
       const dataKeys = Object.keys(data).sort((a, b) => {
         return displayOrder[a] - displayOrder[b];
       });
