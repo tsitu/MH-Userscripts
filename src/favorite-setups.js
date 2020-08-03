@@ -169,6 +169,8 @@
     if (existing) existing.remove();
 
     const rawData = localStorage.getItem("tsitu-owned-components");
+    var editSort = -1; // ast location mod. change to -2 if you want new setups to appear above location sorted setups until they are manually sorted.
+
     const locMap = JSON.parse(localStorage.getItem("ast-location-mapping")); // ast location mod
     // aliases for locations with multiple environment_names for the same environment_type
     locMap["Cursed City"] = {"type": "lost_city"};
@@ -363,7 +365,17 @@
       nameInput.id = "favorite-setup-name";
       nameInput.required = true;
       nameInput.minLength = 1;
-      nameInput.maxLength = 20;
+      nameInput.maxLength = 30;
+      nameInput.addEventListener("keyup", function(event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.keyCode === 13) {
+              // Cancel the default action, if needed
+              event.preventDefault();
+              // Trigger the button element with a click
+              document.getElementById("saveButton").click();
+          }
+      });
+
       const nameInputCol = document.createElement("td");
       nameInputCol.appendChild(nameInput);
 
@@ -391,7 +403,7 @@
         const name = document.querySelector("#favorite-setup-name").value;
         const location = document.querySelector("#favorite-setup-input-location").value;
 
-        if (name.length >= 1 && name.length <= 20) {
+        if (name.length >= 1 && name.length <= 30) {
           const obj = {};
           obj[name] = {
             bait: "N/A",
@@ -408,7 +420,8 @@
           if (data.trinket[charm] !== undefined) obj[name].trinket = charm;
           // if (data.skin[skin] !== undefined) obj[name].skin = skin;
           if (data.location[location] !== undefined) obj[name].location = location;
-          obj[name].sort = -1;
+          obj[name].sort = editSort;
+          console.log("saved setup '"+name+"': "+JSON.stringify(obj[name]));
 
           const storedRaw = localStorage.getItem("favorite-setups-saved");
           if (storedRaw) {
@@ -428,7 +441,10 @@
           } else {
             localStorage.setItem("favorite-setups-saved", JSON.stringify(obj));
           }
+          var saveScroll = document.getElementById("scroller").scrollTop; // ast location mod
           render();
+          document.getElementById("scroller").scrollTop = saveScroll;
+          console.log("scroll position before/after: "+saveScroll+" / "+document.getElementById("scroller").scrollTop);
         } else {
           alert(
             "Please enter a name for your setup that is between 1-20 characters"
@@ -454,6 +470,8 @@
         //   document.querySelector("#favorite-setup-input-skin").value =
         //     user.skin_name; // not really a thing, gotta use a qS probably or parse from LS ID-name map
         // }
+        document.getElementById("favorite-setup-name").focus();
+        console.log("loaded items: ",user.bait_name, user.base_name, user.weapon_name, user.trinket_name, user.environment_name);
       };
 
       const resetButton = document.createElement("button");
@@ -677,6 +695,9 @@
           // document.querySelector("#favorite-setup-input-skin").value =
           // el.skin === "N/A" ? "" : el.skin;
           document.querySelector("#favorite-setup-name").value = name || "";
+          editSort = el.sort; // for sorting name-edited setups after the originating setup this button was clicked on
+          console.log("editing setup: "+name+" from sort position "+editSort);
+          document.getElementById("favorite-setup-name").focus(); // ast location mod
         };
 
         const deleteButton = document.createElement("button");
@@ -692,7 +713,10 @@
                 "favorite-setups-saved",
                 JSON.stringify(storedData)
               );
-              render();
+              // to delete from DOM without a re-render
+              var i = this.parentNode.rowIndex;
+              console.log("deleted '"+name+"' from rowIndex: "+i);
+              document.getElementById("setupTbody").deleteRow(i);
             }
           }
         };
@@ -727,43 +751,27 @@
         setupTbody.appendChild(setupRow);
       }
 
-      // Save and reset sort buttons
-      const saveSort = document.createElement("button");
-      saveSort.innerText = "Save Sort Order";
-      saveSort.onclick = function () {
-        if (confirm("Are you sure you'd like to save this sort order?")) {
-          const storedRaw = localStorage.getItem("favorite-setups-saved");
-          if (storedRaw) {
-            const storedData = JSON.parse(storedRaw);
-            const nameSpans = document.querySelectorAll(
-              ".tsitu-fave-setup-namespan"
-            );
-            if (nameSpans.length === Object.keys(storedData).length) {
-              for (let i = 0; i < nameSpans.length; i++) {
-                const name = nameSpans[i].textContent;
-                if (storedData[name] !== undefined) {
-                  storedData[name].sort = i;
-                }
-              }
-              localStorage.setItem(
-                "favorite-setups-saved",
-                JSON.stringify(storedData)
+      // Toggle sort lock/unlock
+      const toggleSort = document.createElement("button"); // ast location mod
+      toggleSort.id = "toggleSort";
+      toggleSort.innerText = "Click to unlock drag and drop sort";// "Reset Sort Order";
+      toggleSort.onclick = function () {
+          var disabled = $(setupTbody).sortable("option", "disabled");
+          if (disabled) {
+              $(setupTbody).sortable("enable");
+              toggleSort.innerText = "Drag to sort";
+              GM_addStyle( //disable setup name selection when dragging
+                  " .tsitu-fave-setup-namespan {                    grid-area: a;                    font-size: inherit;                    text-align: left;                    text-overflow: ellipsis;                    user-select: none;}"
               );
-              render();
-            }
+          } else {
+              $(setupTbody).sortable("disable");
+              toggleSort.innerText = "Click to unlock sort";
+              GM_addStyle(
+                  " .tsitu-fave-setup-namespan {                    grid-area: a;                    font-size: inherit;                    text-align: left;                    text-overflow: ellipsis;                    user-select: text;}"
+              );
           }
-        }
       };
 
-      const resetSort = document.createElement("button");
-      resetSort.innerText = "Reset Sort Order";
-      resetSort.onclick = function () {
-        if (
-          confirm("Are you sure you'd like to reset to last saved sort order?")
-        ) {
-          render();
-        }
-      };
       const sortSpan = document.createElement("span");
       sortSpan.innerText = "Drag & drop to rearrange setup rows (PC only)";
 
@@ -774,8 +782,31 @@
       $(setupTbody).sortable({
         placeholder: "ui-state-highlight-tsitu",
         scroll: true,
-        scrollSensitivity: 20,
-        scrollSpeed: 20
+        scrollSensitivity: 80,
+        scrollSpeed: 20,
+        cursor: "move",
+        disabled: true,
+        update: function() {
+            const storedRaw = localStorage.getItem("favorite-setups-saved");
+            if (storedRaw) {
+                const storedData = JSON.parse(storedRaw);
+                const nameSpans = document.querySelectorAll(
+                    ".tsitu-fave-setup-namespan"
+                );
+                if (nameSpans.length === Object.keys(storedData).length) {
+                    for (let i = 0; i < nameSpans.length; i++) {
+                        const name = nameSpans[i].textContent;
+                        if (storedData[name] !== undefined) {
+                            storedData[name].sort = i;
+                        }
+                    }
+                    localStorage.setItem(
+                        "favorite-setups-saved",
+                        JSON.stringify(storedData)
+                    );
+                }
+            }
+        }
       });
       setupTable.appendChild(setupTbody);
       setupTableDiv.appendChild(setupTable);
@@ -794,13 +825,11 @@
       mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(setupTableDiv);
       mainDiv.appendChild(document.createElement("br"));
-      mainDiv.appendChild(saveSort);
-      mainDiv.appendChild(document.createTextNode("\u00A0\u00A0"));
-      mainDiv.appendChild(resetSort);
+      mainDiv.appendChild(toggleSort);
       mainDiv.appendChild(document.createElement("br"));
       mainDiv.appendChild(sortSpan);
       document.body.appendChild(mainDiv);
-      dragElement(mainDiv, titleSpan);
+      dragElement(mainDiv, topDiv);
 
       // Reposition popup based on previous dragged location
       const posTop = localStorage.getItem("favorite-setup-pos-top");
