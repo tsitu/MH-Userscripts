@@ -73,6 +73,10 @@
   }
 
   function render() {
+    // Expand container height so that overflow scrollbars don't impact the crown count formatting
+    const blueprintContainer = document.querySelector('.campPage-trap-blueprintContainer');
+    blueprintContainer.style.height = "100%";
+    
     // Track crown counts
     let mouseCount = 0;
     const crownYes = {
