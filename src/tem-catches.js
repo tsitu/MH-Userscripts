@@ -2,7 +2,7 @@
 // @name         MouseHunt - TEM Catch Stats
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.8
+// @version      1.8.1
 // @description  Adds catch/crown statistics next to mouse names on the TEM
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -19,10 +19,12 @@
       window.WebKitMutationObserver ||
       window.MozMutationObserver;
 
-    const observer = new MutationObserver(function () {
-      // Callback
+    function mutationCallback() {
       const labels = document.getElementsByClassName(
         "campPage-trap-trapEffectiveness-difficultyGroup-label"
+      );
+      const blueprintContainer = document.querySelector(
+        ".campPage-trap-blueprintContainer"
       );
 
       // Render if difficulty labels are in DOM
@@ -36,19 +38,60 @@
           .querySelectorAll(".tsitu-tem-catches")
           .forEach(el => el.remove());
 
+        if (blueprintContainer) {
+          blueprintContainer.style.paddingRight = "4em";
+        }
+
         render();
 
         observer.observe(observerTarget, {
           childList: true,
           subtree: true
         });
+      } else {
+        if (blueprintContainer) {
+          blueprintContainer.style.paddingRight = "0";
+        }
       }
+    }
+
+    const observer = new MutationObserver(function () {
+      mutationCallback();
     });
 
     observer.observe(observerTarget, {
       childList: true,
       subtree: true
     });
+
+    /**
+     * Zoom Detection
+     * https://stackoverflow.com/questions/995914/catch-browsers-zoom-event-in-javascript/52008131#52008131
+     */
+    let px_ratio =
+      window.devicePixelRatio ||
+      window.screen.availWidth / document.documentElement.clientWidth;
+
+    function isZooming() {
+      let newPx_ratio =
+        window.devicePixelRatio ||
+        window.screen.availWidth / document.documentElement.clientWidth;
+
+      if (newPx_ratio != px_ratio) {
+        px_ratio = newPx_ratio;
+        // console.log("Zooming");
+        return true;
+      } else {
+        // console.log("Resizing");
+        return false;
+      }
+    }
+
+    window.onresize = function () {
+      if (isZooming()) {
+        mutationCallback();
+      }
+    };
   }
 
   function postReq(form) {
@@ -121,6 +164,9 @@
 
         rows.forEach(row => {
           const name = row.textContent;
+          // const name = "Super Mega Mecha Ultra RoboGold"; // Testing
+          // row.textContent = name; // Testing
+
           const catches = newStored[name];
 
           const span = document.createElement("span");
@@ -201,7 +247,18 @@
         document
           .querySelectorAll(".campPage-trap-trapEffectiveness-mouse")
           .forEach(el => {
-            el.style.height = `${el.offsetHeight + 2}px`;
+            // el.style.height = `${el.offsetHeight + 2}px`; // Deprecated?
+
+            // Height based on mouse name
+            const name = el.querySelector(
+              ".campPage-trap-trapEffectiveness-mouse-name"
+            );
+            el.style.height = `${name.clientHeight + 15}px`;
+
+            // Width based on zoom level
+            name.style.width = "auto";
+            name.style.maxWidth = `${el.clientWidth - 60}px`;
+            // name.style.maxWidth = "102px";
           });
       }
     }
