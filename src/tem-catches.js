@@ -2,13 +2,22 @@
 // @name         MouseHunt - TEM Catch Stats
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.8.1
+// @version      1.8.2
 // @description  Adds catch/crown statistics next to mouse names on the TEM
+// @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
 // ==/UserScript==
 
 (function () {
+  // Hide scrollbar in TEM to fix many width issues
+  GM_addStyle(
+    ".campPage-trap-trapEffectiveness-content { scrollbar-width: none; -ms-overflow-style: none; }" // FF / IE / Edge
+  );
+  GM_addStyle(
+    ".campPage-trap-trapEffectiveness-content::-webkit-scrollbar { width: 0px; }" // Chrome / Safari / Opera
+  );
+
   // Observers are attached to a *specific* element (will DC if removed from DOM)
   const observerTarget = document.querySelector(
     ".mousehuntHud-page-tabContentContainer"
@@ -38,20 +47,12 @@
           .querySelectorAll(".tsitu-tem-catches")
           .forEach(el => el.remove());
 
-        if (blueprintContainer) {
-          blueprintContainer.style.paddingRight = "4em";
-        }
-
         render();
 
         observer.observe(observerTarget, {
           childList: true,
           subtree: true
         });
-      } else {
-        if (blueprintContainer) {
-          blueprintContainer.style.paddingRight = "0";
-        }
       }
     }
 
@@ -243,22 +244,24 @@
           row.appendChild(span);
         });
 
-        // Readjust heights after the fact
+        // Adjust heights after the fact
         document
           .querySelectorAll(".campPage-trap-trapEffectiveness-mouse")
           .forEach(el => {
-            // el.style.height = `${el.offsetHeight + 2}px`; // Deprecated?
+            el.style.height = `${el.offsetHeight + 2}px`;
 
             // Height based on mouse name
-            const name = el.querySelector(
-              ".campPage-trap-trapEffectiveness-mouse-name"
-            );
-            el.style.height = `${name.clientHeight + 15}px`;
+            // const name = el.querySelector(
+            // ".campPage-trap-trapEffectiveness-mouse-name"
+            // );
+            // el.style.height = `${name.clientHeight + 15}px`;
 
             // Width based on zoom level
-            name.style.width = "auto";
-            name.style.maxWidth = `${el.clientWidth - 60}px`;
+            // name.style.width = "auto";
+            // name.style.maxWidth = `${el.clientWidth - 48}px`;
+            // TODO: If we can get the border-width at every zoom level then we can just do: width - 6px (padding) - borderWidth
             // name.style.maxWidth = "102px";
+            // name.style.width = "102px";
           });
       }
     }
