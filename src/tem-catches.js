@@ -11,6 +11,7 @@
 
 (function () {
   // Hide scrollbar in TEM to fix many width issues
+  // https://stackoverflow.com/questions/3296644/hiding-the-scroll-bar-on-an-html-page/54984409#54984409
   GM_addStyle(
     ".campPage-trap-trapEffectiveness-content { scrollbar-width: none; -ms-overflow-style: none; }" // FF / IE / Edge
   );

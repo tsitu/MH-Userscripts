@@ -2,7 +2,7 @@
 // @name         MouseHunt - Marketplace UI Tweaks
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.6.1
+// @version      1.6.2
 // @description  Adds useful features and tweaks to the Marketplace rework
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -625,4 +625,23 @@
     childList: true,
     subtree: true
   });
+
+  /**
+   * 2020.09.28
+   * loadMoreMyHistory and loadMoreMyHistoryByItem need a "self." in front of their showMyHistory calls
+   * Simplest remedy for now seems to be force adding to global scope :/
+   */
+  const loadHistory = hg.views.MarketplaceView.loadMoreMyHistory.toString();
+  if (loadHistory && loadHistory.indexOf("{showMyHistory") >= 0) {
+    unsafeWindow.showMyHistory = function () {
+      hg.views.MarketplaceView.showMyHistory();
+    };
+  }
+
+  const loadItemHistory = hg.views.MarketplaceView.loadMoreMyHistoryByItem.toString();
+  if (loadItemHistory && loadItemHistory.indexOf("{showMyHistoryByItem") >= 0) {
+    unsafeWindow.showMyHistoryByItem = function (itemId) {
+      hg.views.MarketplaceView.showMyHistoryByItem(itemId);
+    };
+  }
 })();
