@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.5.1
+// @version      1.5.2
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -90,6 +90,8 @@
                   // Isle Idol edge case
                   arr[0] = 1127;
                   key = "Isle Idol Trap";
+                } else if (el.name.indexOf("School of Sharks") >= 0) {
+                  key = "School of Sharks";
                 }
               }
 
@@ -160,6 +162,12 @@
           weaponName = "Isle Idol Trap";
         }
 
+        // Edge case `user` checks
+        let userWeapon = user.weapon_name;
+        if (userWeapon === "School of Sharks Trap") {
+          userWeapon = "School of Sharks";
+        }
+
         // Diff current setup with proposed batch to minimize server load
         const diff = {};
         if (data.bait[baitName] && user.bait_name !== baitName) {
@@ -168,7 +176,7 @@
         if (data.base[baseName] && user.base_name !== baseName) {
           diff.base = data.base[baseName][0];
         }
-        if (data.weapon[weaponName] && user.weapon_name !== weaponName) {
+        if (data.weapon[weaponName] && userWeapon !== weaponName) {
           diff.weapon = data.weapon[weaponName][0];
         }
         if (data.trinket[trinketName] && user.trinket_name !== trinketName) {
@@ -400,12 +408,18 @@
       loadButton.style.fontSize = "11px";
       loadButton.textContent = "Import setup";
       loadButton.onclick = function () {
+        // Edge case `user` checks
+        let userWeapon = user.weapon_name;
+        if (userWeapon === "School of Sharks Trap") {
+          userWeapon = "School of Sharks";
+        }
+
         document.querySelector("#favorite-setup-input-cheese").value =
           user.bait_name || "";
         document.querySelector("#favorite-setup-input-base").value =
           user.base_name || "";
         document.querySelector("#favorite-setup-input-weapon").value =
-          user.weapon_name || "";
+          userWeapon || "";
         document.querySelector("#favorite-setup-input-charm").value =
           user.trinket_name || "";
         // if (user.skin_name) {
