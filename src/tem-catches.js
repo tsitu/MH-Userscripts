@@ -2,7 +2,7 @@
 // @name         MouseHunt - TEM Catch Stats
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.8.2
+// @version      1.8.3
 // @description  Adds catch/crown statistics next to mouse names on the TEM
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -101,7 +101,9 @@
       const xhr = new XMLHttpRequest();
       xhr.open(
         "POST",
-        `https://www.mousehuntgame.com/managers/ajax/users/profiletabs.php?action=badges&snuid=${user.sn_user_id}`,
+        // TODO: Update with RH S8 getHuntingStats() on ~11/3
+        // `https://www.mousehuntgame.com/managers/ajax/users/profiletabs.php?action=badges&snuid=${user.sn_user_id}`,
+        `https://www.mousehuntgame.com/managers/ajax/pages/page.php?sn=Hitgrab&hg_is_ajax=1&page_class=HunterProfile&page_arguments%5Btab%5D=kings_crowns&page_arguments%5Bsub_tab%5D=false%page_arguments%5Bsnuid%5D=${user.sn_user_id}`,
         true
       );
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -369,18 +371,31 @@
     try {
       if (res) {
         response = JSON.parse(res.responseText);
-        const badgeData = response["mouse_data"];
-        const remainData = response["remaining_mice"];
         const catchData = {};
 
-        for (let key of Object.keys(badgeData)) {
-          catchData[badgeData[key]["name"]] = badgeData[key]["num_catches"];
+        // STOPGAP LOGIC
+        const badgeGroups =
+          response.page.tabs.kings_crowns.subtabs[0].mouse_crowns.badge_groups;
+        if (badgeGroups) {
+          badgeGroups.forEach(group => {
+            group.mice.forEach(mouse => {
+              catchData[mouse.name] = undoNumberFormat(mouse.num_catches);
+            });
+          });
         }
 
-        for (let el of remainData) {
-          const split = el["name"].split(" (");
-          catchData[split[0]] = parseInt(split[1][0]);
-        }
+        // TEMPORARILY DEPRECATED LOGIC (REINSTATE WITH getHuntingStats?)
+        // const badgeData = response["mouse_data"];
+        // const remainData = response["remaining_mice"];
+
+        // for (let key of Object.keys(badgeData)) {
+        //   catchData[badgeData[key]["name"]] = badgeData[key]["num_catches"];
+        // }
+
+        // for (let el of remainData) {
+        //   const split = el["name"].split(" (");
+        //   catchData[split[0]] = parseInt(split[1][0]);
+        // }
 
         localStorage.setItem("mh-catch-stats", JSON.stringify(catchData));
         localStorage.setItem("mh-catch-stats-timestamp", Date.now());
