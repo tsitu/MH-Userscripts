@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         MouseHunt - Summary Log Tracker
+// @name         MouseHunt - Log Tracker
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      0.1 (beta)
+// @version      0.2 (beta)
 // @description  Stores, summarizes, and displays 'Hunter's Progress Report' logs
 // @require      https://cdn.jsdelivr.net/npm/localforage@1.9.0/dist/localforage.min.js
 // @match        http://www.mousehuntgame.com/*
@@ -11,7 +11,7 @@
 
 (function () {
   if (!localforage) {
-    console.group("MouseHunt - Summary Log Tracker");
+    console.group("MouseHunt - Log Tracker");
     console.log("localforage dependency not found. Please refresh!");
     console.groupEnd();
   } else {
@@ -73,12 +73,31 @@
          * 12: Journal Entry ID (e.g. 61716)
          * 13: Timestamp (e.g. 1581057691440)
          */
-        const valueArr = [];
+
+        // Skip if User ID attached to the journal is not your own (aka on someone else's profile)
+        const journalActions = logEl
+          .querySelector(".journalactions")
+          .querySelector("a");
+        const currentID = journalActions
+          .getAttribute("data-params-string")
+          .split("user_id=")[1]
+          .split("&")[0];
+        if (currentID != user.user_id) {
+          console.group("MouseHunt - Log Tracker");
+          console.log(
+            `Skipped foreign journal entry from User ID ${currentID}`
+          );
+          console.groupEnd();
+          return;
+        }
+
+        let valueArr = [];
         logEl.querySelectorAll(".value").forEach(el => {
           valueArr.push(el.textContent);
         });
 
-        if (valueArr.length === 10) {
+        if (valueArr.length >= 10) {
+          valueArr = valueArr.slice(0, 10); // IMPORTANT: Accuracy is only preserved if custom/anomalous values come after first 10
           const durationSubtitle = logEl
             .querySelector(".reportSubtitle")
             .textContent.split("Last ")[1];
@@ -135,7 +154,7 @@
       if (existingData) {
         if (Object.keys(existingData).indexOf(idString) < 0) {
           if (deepDupeCheck(existingData, valueArr)) {
-            console.group("MouseHunt - Summary Log Tracker");
+            console.group("MouseHunt - Log Tracker");
             console.log(
               `Deep dupe check skipped a journal entry with idString: "${idString}"`
             );
@@ -146,7 +165,7 @@
             await localforage.setItem("tsitu-log-tracker", existingData);
           }
         } else {
-          console.group("MouseHunt - Summary Log Tracker");
+          console.group("MouseHunt - Log Tracker");
           console.log(
             `Skipped duplicate journal entry with idString: "${idString}"`
           );
@@ -254,10 +273,26 @@
             logTd.style.padding = "1px";
             const logButton = document.createElement("button");
             logButton.innerText = dataArr[12];
-            logButton.onclick = function () {
+            logButton.addEventListener("click", function () {
               const evalStr = dataArr[11];
               eval(unescape(evalStr));
-            };
+            });
+            logButton.addEventListener("contextmenu", async function (event) {
+              if (confirm("Delete this hunting log entry?")) {
+                if (
+                  confirm(
+                    "Are you sure you'd like to DELETE? This action cannot be undone."
+                  )
+                ) {
+                  delete data[key];
+                  await localforage.setItem("tsitu-log-tracker", data);
+                  document
+                    .querySelectorAll(".tsitu-log-tracker")
+                    .forEach(el => el.remove());
+                }
+              }
+              event.preventDefault();
+            });
             logTd.appendChild(logButton);
             row.appendChild(logTd);
 
