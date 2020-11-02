@@ -2,7 +2,7 @@
 // @name         MouseHunt - Log Tracker
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      0.2 (beta)
+// @version      0.2.1 (beta)
 // @description  Stores, summarizes, and displays 'Hunter's Progress Report' logs
 // @require      https://cdn.jsdelivr.net/npm/localforage@1.9.0/dist/localforage.min.js
 // @match        http://www.mousehuntgame.com/*
@@ -15,6 +15,12 @@
     console.log("localforage dependency not found. Please refresh!");
     console.groupEnd();
   } else {
+    // Wait for full page load before calling functions
+    window.addEventListener("load", function () {
+      journalScanner();
+      generateTab();
+    });
+
     // Observe for HunterProfile presence (to re-inject custom tab)
     const observerTarget = document.querySelector(".mousehuntPage-content");
     if (observerTarget) {
@@ -127,7 +133,6 @@
         }
       }
     }
-    journalScanner();
 
     /**
      * TODO: Parse onclick showLogSummary string for mouse, location, cheese, and loot data
@@ -218,7 +223,7 @@
         .forEach(el => el.remove());
 
       const isProfile = document.querySelector(
-        ".mousehuntPage-content.PageHunterProfile"
+        "#mousehuntContainer.PageHunterProfile"
       );
       if (isProfile) {
         const dataTab = document.createElement("div");
@@ -374,7 +379,6 @@
         }
       }
     }
-    generateTab();
   }
 
   /**
