@@ -2,7 +2,7 @@
 // @name         MouseHunt - QoL Utilities
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.1.1
+// @version      1.1.2
 // @description  Miscellaneous utilities to turbo-charge your MH experience
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -431,6 +431,7 @@
       "Marching through the Sandtail Desert.": "Fiery Warpath",
       "Dodging arrows, spears, swords, and spells!": "Fiery Warpath",
       "Investigating what can be built in a workshop.": "Floating Islands",
+      "Searching the skies for treasure.": "Floating Islands",
       "Trapped between two planes of existence.": "Forbidden Grove",
       "Behind heavy stone gates.": "Forbidden Grove",
       "Carefully navigating a subterranean and humid environment.":
