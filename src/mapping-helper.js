@@ -2,7 +2,7 @@
 // @name         MouseHunt - Mapping Helper
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      2.5
+// @version      2.6
 // @description  Map interface improvements (invite via Hunter ID, direct send SB+, TEM-based available uncaught map mice)
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -79,7 +79,9 @@
         });
 
         if (currentMap.name.indexOf("Scavenger") < 0) {
-          const remainStr = `${currentMap.map_id}~${currentMap.remaining}`;
+          const remainStr = currentMap.remaining
+            ? `${currentMap.map_id}~${currentMap.remaining}`
+            : `${currentMap.map_id}~${currentMap.num_found}`;
           const cacheRemain = localStorage.getItem("tsitu-maptem-remain");
           if (cacheRemain) {
             if (remainStr !== cacheRemain) {
@@ -366,25 +368,23 @@
 
     refreshButton.addEventListener("click", function () {
       // Clear cache (is it possible to only do so for just a single map?)
-      hg.views.TreasureMapManagerView.clearMapCache();
+      hg.controllers.TreasureMap.clearMapCache();
 
-      // Parse map ID from 'Preview' button (should be robust enough)
+      // Parse map ID
+      // Note: Unable to get ID for map currently in preview mode
       let mapId = -1;
-      const previewButton = document.querySelector(
-        ".treasureMapView-mapMenu-group-actions .mousehuntActionButton.tiny.lightBlue"
+      const activeTab = document.querySelector(
+        ".treasureMapRootView-tab.active"
       );
-      if (previewButton) {
-        mapId = previewButton.onclick
-          .toString()
-          .split("RewardsDialog(")[1]
-          .split(");")[0];
+      if (activeTab) {
+        mapId = activeTab.getAttribute("data-type");
       }
 
       // Close dialog and re-open with either current map or overview
       document.getElementById("jsDialogClose").click();
       mapId === -1
-        ? hg.views.TreasureMapManagerView.show()
-        : hg.views.TreasureMapManagerView.show(mapId);
+        ? hg.controllers.TreasureMap.show()
+        : hg.controllers.TreasureMap.show(mapId);
     });
 
     refreshSpan.appendChild(refreshButton);
@@ -409,30 +409,29 @@
     const cacheRaw = localStorage.getItem("tsitu-mapping-cache");
     if (cacheRaw) {
       const cache = JSON.parse(cacheRaw);
+      let mapName;
+
       const checkMap = document.querySelector(
-        ".treasureMapManagerView-task.active"
+        ".treasureMapRootView-tab.active"
       );
+      if (checkMap) {
+        mapName = checkMap.querySelector(".treasureMapRootView-tab-name")
+          .textContent;
+      }
+
       const checkPreview = document.querySelector(
         ".treasureMapView-previewBar-content"
       );
-
-      let mapName;
-      if (checkMap) {
-        mapName = checkMap.querySelector(".treasureMapManagerView-task-name")
-          .textContent;
-      }
       if (checkPreview) {
         mapName = checkPreview.textContent
           .split("'s ")[1]
-          .split(".Back to Invites")[0];
+          .split(".Back to Community")[0];
       }
 
       if (cache[mapName] !== undefined) {
-        // Must specify <a> because favorite button <div> also matches the selector
-        const mapIdEl = document.querySelector("a[data-task-id].active");
-        if (mapIdEl) {
+        if (checkMap) {
           // Abstract equality comparison because map ID can be number or string
-          const mapId = mapIdEl.getAttribute("data-task-id");
+          const mapId = checkMap.getAttribute("data-type");
           if (mapId == cache[mapName].map_id) {
             // "Last refreshed" timestamp
             if (cache[mapName].timestamp) {
@@ -450,11 +449,8 @@
               inputLabel.htmlFor = "tsitu-mapping-id-input";
 
               const inputField = document.createElement("input");
-              inputField.setAttribute("type", "number");
               inputField.setAttribute("name", "tsitu-mapping-id-input");
-              inputField.setAttribute("data-lpignore", "true"); // Get rid of LastPass Autofill
-              inputField.setAttribute("min", 1);
-              inputField.setAttribute("max", 9999999);
+              inputField.setAttribute("data-lpignore", "true"); // Nuke LastPass Autofill
               inputField.setAttribute("placeholder", "e.g. 1234567");
               inputField.setAttribute("required", true);
               inputField.addEventListener("keyup", function (e) {
@@ -481,7 +477,7 @@
               inviteButton.style.marginLeft = "5px";
               inviteButton.innerText = "Invite";
               inviteButton.addEventListener("click", function () {
-                const rawText = inputField.value;
+                const rawText = inputField.value.replace(/\D/g, "");
                 if (rawText.length > 0) {
                   const hunterId = parseInt(rawText);
                   if (typeof hunterId === "number" && !isNaN(hunterId)) {
@@ -506,7 +502,7 @@
                               ) {
                                 postReq(
                                   "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php",
-                                  `sn=Hitgrab&hg_is_ajax=1&action=send_invites&map_id=${mapId}&snuids%5B%5D=${data.sn_user_id}&uh=${user.unique_hash}`
+                                  `sn=Hitgrab&hg_is_ajax=1&action=send_invites&map_id=${mapId}&snuids%5B%5D=${data.sn_user_id}&uh=${user.unique_hash}&last_read_journal_entry_id=${lastReadJournalEntryId}`
                                 ).then(res2 => {
                                   let inviteRes = null;
                                   try {
@@ -664,7 +660,7 @@
 
       // Render if treasure map popup is available
       const mapTab = observerTarget.querySelector(
-        ".treasureMapManagerView-header-navigation-item.tasks.active"
+        ".treasureMapRootView-tab.active"
       );
       const groupLen = document.querySelectorAll(
         ".treasureMapView-goals-groups"
@@ -672,7 +668,7 @@
 
       // Prevent conflict with 'Bulk Map Invites'
       const inviteHeader = document.querySelector(
-        ".treasureMapManagerDialogView-inviteFriend-header"
+        ".treasureMapUserSelectorView" // TODO: may need fine tuning once that script is fixed
       );
 
       if (
