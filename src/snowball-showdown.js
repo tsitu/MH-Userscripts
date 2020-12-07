@@ -13,14 +13,15 @@
   XMLHttpRequest.prototype.open = function () {
     this.addEventListener("load", function () {
       if (
-        this.responseURL ===
-        "https://www.mousehuntgame.com/managers/ajax/events/snowball_showdown.php"
+        this.responseURL.indexOf(
+          "mousehuntgame.com/managers/ajax/events/snowball_showdown.php"
+        ) >= 0
       ) {
         console.group("Snowball Showdown Helper");
         let game;
         try {
-          game = JSON.parse(this.responseText)["game"];
-          if (game["is_active"] === true && !game["is_complete"]) {
+          game = JSON.parse(this.responseText)["snowball_showdown_game"];
+          if (game["is_active"] == true && !game["is_complete"]) {
             if (game["num_snowballs"] > 0) {
               parseBoard(game);
             } else {
@@ -107,6 +108,7 @@
      * Calculate scores and ideal position(s)
      */
     const scoreArray = [];
+    const noHits = [];
     const highScore = [0, []];
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 11; j++) {
@@ -119,23 +121,25 @@
         } else if (score === highScore[0]) {
           highScore[1].push(dataVal);
         }
+
+        if (score === 0) {
+          noHits.push(dataVal); // Accumulate guaranteed no hit tiles
+        }
       }
     }
     // console.log(scoreArray);
     // console.log(highScore);
+    // console.log(noHits);
 
     /**
      * Place suggestion(s) onto UI
-     * TODO: Null out score = 0 tiles which have guaranteed no chance of being a hit a la Eggsweeper -1?
      */
-    displayStats(board);
-
     // Inject tile titles with "Score: #"
     for (let i = 1; i < 67; i++) {
       const tile = document
-        .querySelector(".winterHunt2014Minigame-layer.tiles")
+        .querySelector(".snowballShowdownView-layer.tiles")
         .querySelector(
-          `.winterHunt2014Minigame-board-row-cell[data-index="${i}"]`
+          `.snowballShowdownView-board-row-cell[data-index="${i}"]`
         );
       tile.setAttribute(
         "title",
@@ -151,11 +155,16 @@
             });
             document
               .querySelectorAll(
-                ".winterHunt2014Minigame-layer.tiles .winterHunt2014Minigame-board-row-cell"
+                ".snowballShowdownView-layer.tiles .snowballShowdownView-board-row-cell"
               )
               .forEach(node => {
                 node.removeAttribute("title");
               });
+          }
+
+          // Reset disabled class if user overrode indicator and clicked anyway
+          if (tile.className.indexOf("disabled") >= 0) {
+            tile.classList.toggle("disabled");
           }
         });
         tile.setAttribute("tsitu-click-listener", "true");
@@ -165,13 +174,13 @@
     // Add targeting overlay for high scores
     for (let i = 0; i < highScore[1].length; i++) {
       const tile = document
-        .querySelector(".winterHunt2014Minigame-layer.tiles")
+        .querySelector(".snowballShowdownView-layer.tiles")
         .querySelector(
-          `.winterHunt2014Minigame-board-row-cell[data-index="${highScore[1][i]}"]`
+          `.snowballShowdownView-board-row-cell[data-index="${highScore[1][i]}"]`
         );
 
       if (tile) {
-        // Inject "o" target(s) into UI (TODO: push update with potential nullout feature)
+        // Inject "o" target(s) into UI
         const textSpan = document.createElement("span");
         textSpan.className = "snowball-tile-target";
         textSpan.textContent = "o";
@@ -183,6 +192,23 @@
       }
     }
 
+    // Mark guaranteed no hit tiles
+    for (let el of noHits) {
+      const tile = document
+        .querySelector(".snowballShowdownView-layer.tiles")
+        .querySelector(
+          `.snowballShowdownView-board-row-cell[data-index="${el}"]`
+        );
+
+      if (tile && tile.className.indexOf("available") >= 0) {
+        if (!tile.classList.contains("disabled")) {
+          tile.classList.toggle("disabled");
+          tile.style.pointerEvents = "auto";
+        }
+      }
+    }
+
+    displayStats(board);
     console.timeEnd("Duration");
   }
 
@@ -210,7 +236,7 @@
     }
 
     // Snowball stats on top left of game UI
-    const mainTitle = document.querySelector(".winterHunt2014Minigame-title");
+    const mainTitle = document.querySelector(".snowballShowdownView-title");
     const leftSpan = document.createElement("span");
     leftSpan.id = "title-span-data";
     leftSpan.textContent = `Hits:        ${countHit}\r\nMisses:   ${countMiss}\r\nTotal:      ${
@@ -218,7 +244,7 @@
     }`;
     leftSpan.setAttribute(
       "style",
-      "text-shadow: none; white-space: pre; z-index: 100; position: absolute; color: black; font-size: 16px; left: 35px; top: 15px; text-align: left;"
+      "text-shadow: 1px 1px 10px #608bec, 1px 1px 2px #000; white-space: pre; z-index: 100; position: absolute; color: #fff; font-size: 16px; left: 35px; top: 15px; text-align: left;"
     );
     mainTitle.appendChild(leftSpan);
   }
