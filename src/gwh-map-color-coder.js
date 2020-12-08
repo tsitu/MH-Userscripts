@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         MouseHunt - GWH Map Color Coder 2019
+// @name         MouseHunt - GWH Map Color Coder
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.1
+// @version      1.3
 // @description  Color codes mice on GWH maps according to decorations & cheese
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -48,7 +48,7 @@ const snowMice = [
   "Snow Sorceress",
   "Reinbo",
   "Tundra Huntress",
-  "Stuck Snowball",
+  "Snowblower",
   "Snow Boulder"
 ];
 
@@ -70,9 +70,10 @@ const pecanMice = [
   "Naughty Nougat",
   "Nice Knitting",
   "Ridiculous Sweater",
+  "Shorts-All-Year",
   "Snow Golem Jockey",
   "Snow Scavenger",
-  "Snowblower"
+  "Stuck Snowball"
 ];
 
 const sbMice = [
@@ -92,12 +93,9 @@ const standardMice = [
   "Triple Lutz"
 ];
 
-const gwhMaps = [
-  "Nice List",
-  "Rare Nice List",
-  "Naughty List",
-  "Rare Naughty List"
-];
+const liscMice = ["Snow Golem Architect"];
+
+const winterMice = ["Snowflake"];
 
 function colorize() {
   let sportColor = "#c97c49"; // brown-ish
@@ -118,6 +116,10 @@ function colorize() {
   let sbCount = 0;
   let standardColor = "#afa500"; // mountain dew-ish
   let standardCount = 0;
+  let liscColor = "#6a62ad"; // medium purple
+  let liscCount = 0;
+  let winterColor = "#338838"; // darker green
+  let winterCount = 0;
   const greyColor = "#949494";
 
   const isChecked =
@@ -199,6 +201,20 @@ function colorize() {
       } else {
         if (isChecked) el.style.backgroundColor = "white";
       }
+    } else if (liscMice.indexOf(mouseName) > -1) {
+      el.style.backgroundColor = liscColor;
+      if (el.className.indexOf(" complete ") < 0) {
+        liscCount++;
+      } else {
+        if (isChecked) el.style.backgroundColor = "white";
+      }
+    } else if (winterMice.indexOf(mouseName) > -1) {
+      el.style.backgroundColor = winterColor;
+      if (el.className.indexOf(" complete ") < 0) {
+        winterCount++;
+      } else {
+        if (isChecked) el.style.backgroundColor = "white";
+      }
     }
   });
 
@@ -211,6 +227,8 @@ function colorize() {
   pecanColor = pecanCount > 0 ? pecanColor : greyColor;
   sbColor = sbCount > 0 ? sbColor : greyColor;
   standardColor = standardCount > 0 ? standardColor : greyColor;
+  liscColor = liscCount > 0 ? liscColor : greyColor;
+  winterColor = winterCount > 0 ? winterColor : greyColor;
 
   // Remove existing GWH Map related elements before proceeding
   document.querySelectorAll(".tsitu-gwh-map").forEach(el => el.remove());
@@ -220,7 +238,7 @@ function colorize() {
   masterDiv.style =
     "display: inline-flex; margin-bottom: 10px; width: 100%; text-align: center; line-height: 1.5; overflow: hidden";
   const spanStyle =
-    "; width: auto; padding: 5px; font-weight: bold; font-size: 12.5px";
+    "; width: auto; padding: 5px; font-weight: bold; font-size: 12.75px; text-shadow: 0px 0px 11px white";
 
   const sportSpan = document.createElement("span");
   sportSpan.style = "background-color: " + sportColor + spanStyle;
@@ -232,7 +250,7 @@ function colorize() {
 
   const ornamentalSpan = document.createElement("span");
   ornamentalSpan.style = "background-color: " + ornamentalColor + spanStyle;
-  ornamentalSpan.innerHTML = "Ornament<br>" + ornamentalCount;
+  ornamentalSpan.innerHTML = "Orna<br>" + ornamentalCount;
 
   const snowSpan = document.createElement("span");
   snowSpan.style = "background-color: " + snowColor + spanStyle;
@@ -240,7 +258,7 @@ function colorize() {
 
   const fireworksSpan = document.createElement("span");
   fireworksSpan.style = "background-color: " + fireworksColor + spanStyle;
-  fireworksSpan.innerHTML = "Fireworks<br>" + fireworksCount;
+  fireworksSpan.innerHTML = "Fire<br>" + fireworksCount;
 
   const glazySpan = document.createElement("span");
   glazySpan.style = "background-color: " + glazyColor + spanStyle;
@@ -256,7 +274,15 @@ function colorize() {
 
   const standardSpan = document.createElement("span");
   standardSpan.style = "background-color: " + standardColor + spanStyle;
-  standardSpan.innerHTML = "Standard<br>" + standardCount;
+  standardSpan.innerHTML = "Basic<br>" + standardCount;
+
+  const liscSpan = document.createElement("span");
+  liscSpan.style = "background-color: " + liscColor + spanStyle;
+  liscSpan.innerHTML = "LISC<br>" + liscCount;
+
+  const winterSpan = document.createElement("span");
+  winterSpan.style = "background-color: " + winterColor + spanStyle;
+  winterSpan.innerHTML = "Winter<br>" + winterCount;
 
   // Highlight uncaught only feature
   const highlightLabel = document.createElement("label");
@@ -268,7 +294,7 @@ function colorize() {
   highlightBox.name = "tsitu-highlight-box";
   highlightBox.style.verticalAlign = "middle";
   highlightBox.checked = isChecked;
-  highlightBox.addEventListener("click", function() {
+  highlightBox.addEventListener("click", function () {
     if (highlightBox.checked) {
       localStorage.setItem("highlightPref", "uncaught-only");
     } else {
@@ -279,8 +305,7 @@ function colorize() {
 
   const highlightDiv = document.createElement("div");
   highlightDiv.className = "tsitu-gwh-map";
-  highlightDiv.style =
-    "margin-bottom: 5px; width: 35%; border: 1px dotted black";
+  highlightDiv.style = "float: right; position: relative; z-index: 1";
   highlightDiv.appendChild(highlightBox);
   highlightDiv.appendChild(highlightLabel);
 
@@ -294,6 +319,8 @@ function colorize() {
   masterDiv.appendChild(pecanSpan);
   masterDiv.appendChild(sbSpan);
   masterDiv.appendChild(standardSpan);
+  masterDiv.appendChild(liscSpan);
+  masterDiv.appendChild(winterSpan);
 
   // Inject into DOM
   const insertEl = document.querySelector(
@@ -302,7 +329,7 @@ function colorize() {
   if (
     insertEl &&
     document.querySelector(
-      ".treasureMapManagerView-header-navigation-item.tasks.active"
+      ".treasureMapRootView-header-navigation-item.tasks.active" // On "Active Maps"
     )
   ) {
     insertEl.insertAdjacentElement("afterbegin", highlightDiv);
@@ -310,21 +337,28 @@ function colorize() {
   }
 
   // "Goals" button
-  document.querySelector("[data-type='show_goals']").onclick = function() {
+  document.querySelector("[data-type='show_goals']").onclick = function () {
     colorize();
   };
 }
 
 // Listen to XHRs, opening a map always at least triggers board.php
 const originalOpen = XMLHttpRequest.prototype.open;
-XMLHttpRequest.prototype.open = function() {
-  this.addEventListener("load", function() {
-    const mapEl = document.querySelector(
-      ".treasureMapManagerView-task.active .treasureMapManagerView-task-name"
+XMLHttpRequest.prototype.open = function () {
+  this.addEventListener("load", function () {
+    const chestEl = document.querySelector(
+      ".treasureMapView-mapMenu-rewardName"
     );
-    if (mapEl) {
-      const mapName = mapEl.textContent;
-      if (mapName && gwhMaps.indexOf(mapName) > -1) {
+
+    // 2019: Nice/Naughty List descriptors present in HUD, not so in 2020
+    // 2020: "2018-2020 [Rare] Nice Treasure Chest" & "2020 [Rare] Naughty Treasure Chest"
+    if (chestEl) {
+      const chestName = chestEl.textContent;
+      if (
+        chestName &&
+        (chestName.indexOf("Nice Treasure Chest") >= 0 ||
+          chestName.indexOf("Naughty Treasure Chest") >= 0)
+      ) {
         colorize();
       }
     }
