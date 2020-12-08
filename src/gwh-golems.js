@@ -2,13 +2,13 @@
 // @name         MouseHunt - GWH Golem Names
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.3
+// @version      1.5
 // @description  Adds fun and quirky names to your Snow Golems!
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
 // ==/UserScript==
 
-(function() {
+(function () {
   const adj = [
     "N/A",
     "Accountant",
@@ -329,36 +329,38 @@
 
   // 2018: 132 total (old strat missed 74)
   // 2019: 13 * 12 = 156 total
+  // 2020: Same as 2019
   // console.log(`adj: ${adj.length - 1}`);
 
   // 2018: 130 total (old strat missed 64)
   // 2019: 14 * 11 = 154 total
+  // 2020: Same as 2019
   // console.log(`name: ${name.length - 1}`);
 
   const golemContainer = document.querySelector(
-    ".winterHunt2019HUD-golemContainer"
+    ".winterHunt2020HUD-golemContainer"
   );
   if (golemContainer) {
-    golemContainer.addEventListener("click", function() {
+    golemContainer.addEventListener("click", function () {
       const golemClass = document.getElementsByClassName(
-        "winterHunt2019HUD-popup-golem"
+        "winterHunt2020HUD-popup-golem"
       );
       if (golemClass.length > 0) {
         for (let i = 0; i < 3; i++) {
           if (golemClass[i].classList.contains("visible")) {
             golemClass[i]
               .querySelector(
-                ".winterHunt2019HUD-popup-golemDoll-scrambleButton"
+                ".winterHunt2020HUD-popup-golemDoll-scrambleButton"
               )
-              .addEventListener("click", function() {
+              .addEventListener("click", function () {
                 generateText(golemClass[i]);
               });
 
             const partButtons = golemClass[i].querySelectorAll(
-              ".winterHunt2019HUD-popup-golemDoll-control"
+              ".winterHunt2020HUD-popup-golemDoll-control"
             );
             for (let partButton of partButtons) {
-              partButton.addEventListener("click", function() {
+              partButton.addEventListener("click", function () {
                 generateText(golemClass[i]);
               });
             }
@@ -371,7 +373,7 @@
               if (existingSpan) existingSpan.remove();
 
               const golemArr = golemClass.querySelector(
-                ".winterHunt2019HUD-customGolem"
+                ".winterHunt2020HUD-customGolem"
               ).children;
 
               const headID = parseInt(golemArr[0].className.split("piece_")[1]);
@@ -384,6 +386,7 @@
               // Normalize array indices
               // 2018: 13 heads, 11 arms, 12 legs, 10 torsos
               // 2019: 14 heads, 12 arms, 13 legs, 11 torsos
+              // 2020: Same as 2019
               let adjIndex = (armsID - 1) * 13 + legsID; // multiply by # legs
               if (adjIndex < 0) adjIndex = 0;
               let nameIndex = (torsoID - 1) * 14 + headID; // multiply by # heads
