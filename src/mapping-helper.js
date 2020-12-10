@@ -2,7 +2,7 @@
 // @name         MouseHunt - Mapping Helper
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      2.6
+// @version      2.6.1
 // @description  Map interface improvements (invite via Hunter ID, direct send SB+, TEM-based available uncaught map mice)
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -343,7 +343,7 @@
     masterEl.style.border = "1px";
     masterEl.style.borderStyle = "dotted";
     const masterElLegend = document.createElement("legend");
-    masterElLegend.innerText = "Mapping Helper v2.0 by tsitu";
+    masterElLegend.innerText = "Mapping Helper v2.6.1 by tsitu";
     masterEl.appendChild(masterElLegend);
 
     /**
@@ -411,12 +411,20 @@
       const cache = JSON.parse(cacheRaw);
       let mapName;
 
-      const checkMap = document.querySelector(
+      const tabHeader = document.querySelector(
         ".treasureMapRootView-tab.active"
       );
-      if (checkMap) {
-        mapName = checkMap.querySelector(".treasureMapRootView-tab-name")
+      if (tabHeader) {
+        mapName = tabHeader.querySelector(".treasureMapRootView-tab-name")
           .textContent;
+      } else {
+        // Tab header disappears when only 1 map is open, so fall back to HUD label
+        const hudLabel = document.querySelector(
+          ".mousehuntHud-userStat.treasureMap .label"
+        );
+        if (hudLabel) {
+          mapName = hudLabel.textContent;
+        }
       }
 
       const checkPreview = document.querySelector(
@@ -429,134 +437,134 @@
       }
 
       if (cache[mapName] !== undefined) {
-        if (checkMap) {
-          // Abstract equality comparison because map ID can be number or string
-          const mapId = checkMap.getAttribute("data-type");
-          if (mapId == cache[mapName].map_id) {
-            // "Last refreshed" timestamp
-            if (cache[mapName].timestamp) {
-              const timeSpan = document.createElement("span");
-              timeSpan.innerText = `(This map was last refreshed on: ${new Date(
-                parseInt(cache[mapName].timestamp)
-              ).toLocaleString()})`;
-              refreshSpan.appendChild(timeSpan);
+        // Abstract equality comparison because map ID can be number or string
+        const mapId = tabHeader
+          ? tabHeader.getAttribute("data-type")
+          : user.quests.QuestRelicHunter.default_map_id;
+        if (mapId == cache[mapName].map_id) {
+          // "Last refreshed" timestamp
+          if (cache[mapName].timestamp) {
+            const timeSpan = document.createElement("span");
+            timeSpan.innerText = `(This map was last refreshed on: ${new Date(
+              parseInt(cache[mapName].timestamp)
+            ).toLocaleString()})`;
+            refreshSpan.appendChild(timeSpan);
+          }
+
+          // Invite via Hunter ID (only for map captains)
+          if (cache[mapName].is_owner) {
+            const inputLabel = document.createElement("label");
+            inputLabel.innerText = "Hunter ID: ";
+            inputLabel.htmlFor = "tsitu-mapping-id-input";
+
+            const inputField = document.createElement("input");
+            inputField.setAttribute("name", "tsitu-mapping-id-input");
+            inputField.setAttribute("data-lpignore", "true"); // Nuke LastPass Autofill
+            inputField.setAttribute("placeholder", "e.g. 1234567");
+            inputField.setAttribute("required", true);
+            inputField.addEventListener("keyup", function (e) {
+              if (e.keyCode === 13) {
+                inviteButton.click(); // 'Enter' pressed
+              }
+            });
+
+            const overrideStyle =
+              "input[name='tsitu-mapping-id-input'] { -webkit-appearance:textfield; -moz-appearance:textfield; appearance:textfield; } input[name='tsitu-mapping-id-input']::-webkit-outer-spin-button, input[name='tsitu-mapping-id-input']::-webkit-inner-spin-button { display:none; -webkit-appearance:none; margin:0; }";
+            let stylePresent = false;
+            document.querySelectorAll("style").forEach(style => {
+              if (style.textContent === overrideStyle) {
+                stylePresent = true;
+              }
+            });
+            if (!stylePresent) {
+              const spinOverride = document.createElement("style");
+              spinOverride.innerHTML = overrideStyle;
+              document.body.appendChild(spinOverride);
             }
 
-            // Invite via Hunter ID (only for map captains)
-            if (cache[mapName].is_owner) {
-              const inputLabel = document.createElement("label");
-              inputLabel.innerText = "Hunter ID: ";
-              inputLabel.htmlFor = "tsitu-mapping-id-input";
-
-              const inputField = document.createElement("input");
-              inputField.setAttribute("name", "tsitu-mapping-id-input");
-              inputField.setAttribute("data-lpignore", "true"); // Nuke LastPass Autofill
-              inputField.setAttribute("placeholder", "e.g. 1234567");
-              inputField.setAttribute("required", true);
-              inputField.addEventListener("keyup", function (e) {
-                if (e.keyCode === 13) {
-                  inviteButton.click(); // 'Enter' pressed
-                }
-              });
-
-              const overrideStyle =
-                "input[name='tsitu-mapping-id-input'] { -webkit-appearance:textfield; -moz-appearance:textfield; appearance:textfield; } input[name='tsitu-mapping-id-input']::-webkit-outer-spin-button, input[name='tsitu-mapping-id-input']::-webkit-inner-spin-button { display:none; -webkit-appearance:none; margin:0; }";
-              let stylePresent = false;
-              document.querySelectorAll("style").forEach(style => {
-                if (style.textContent === overrideStyle) {
-                  stylePresent = true;
-                }
-              });
-              if (!stylePresent) {
-                const spinOverride = document.createElement("style");
-                spinOverride.innerHTML = overrideStyle;
-                document.body.appendChild(spinOverride);
-              }
-
-              const inviteButton = document.createElement("button");
-              inviteButton.style.marginLeft = "5px";
-              inviteButton.innerText = "Invite";
-              inviteButton.addEventListener("click", function () {
-                const rawText = inputField.value.replace(/\D/g, "");
-                if (rawText.length > 0) {
-                  const hunterId = parseInt(rawText);
-                  if (typeof hunterId === "number" && !isNaN(hunterId)) {
-                    if (hunterId > 0 && hunterId < 9999999) {
-                      postReq(
-                        "https://www.mousehuntgame.com/managers/ajax/pages/friends.php",
-                        `sn=Hitgrab&hg_is_ajax=1&action=community_search_by_id&user_id=${hunterId}&uh=${user.unique_hash}`
-                      ).then(res => {
-                        let response = null;
-                        try {
-                          if (res) {
-                            response = JSON.parse(res.responseText);
-                            const data = response.friend;
+            const inviteButton = document.createElement("button");
+            inviteButton.style.marginLeft = "5px";
+            inviteButton.innerText = "Invite";
+            inviteButton.addEventListener("click", function () {
+              const rawText = inputField.value.replace(/\D/g, "");
+              if (rawText.length > 0) {
+                const hunterId = parseInt(rawText);
+                if (typeof hunterId === "number" && !isNaN(hunterId)) {
+                  if (hunterId > 0 && hunterId < 9999999) {
+                    postReq(
+                      "https://www.mousehuntgame.com/managers/ajax/pages/friends.php",
+                      `sn=Hitgrab&hg_is_ajax=1&action=community_search_by_id&user_id=${hunterId}&uh=${user.unique_hash}`
+                    ).then(res => {
+                      let response = null;
+                      try {
+                        if (res) {
+                          response = JSON.parse(res.responseText);
+                          const data = response.friend;
+                          if (
+                            data.user_interactions.actions.send_map_invite
+                              .has_maps
+                          ) {
                             if (
-                              data.user_interactions.actions.send_map_invite
-                                .has_maps
+                              confirm(
+                                `Are you sure you'd like to invite this hunter?\n\nName: ${data.name}\nTitle: ${data.title_name} (${data.title_percent}%)\nLocation: ${data.environment_name}\nLast Active: ${data.last_active_formatted} ago`
+                              )
                             ) {
-                              if (
-                                confirm(
-                                  `Are you sure you'd like to invite this hunter?\n\nName: ${data.name}\nTitle: ${data.title_name} (${data.title_percent}%)\nLocation: ${data.environment_name}\nLast Active: ${data.last_active_formatted} ago`
-                                )
-                              ) {
-                                postReq(
-                                  "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php",
-                                  `sn=Hitgrab&hg_is_ajax=1&action=send_invites&map_id=${mapId}&snuids%5B%5D=${data.sn_user_id}&uh=${user.unique_hash}&last_read_journal_entry_id=${lastReadJournalEntryId}`
-                                ).then(res2 => {
-                                  let inviteRes = null;
-                                  try {
-                                    if (res2) {
-                                      inviteRes = JSON.parse(res2.responseText);
-                                      if (inviteRes.success === 1) {
-                                        refreshButton.click();
-                                      } else {
-                                        alert(
-                                          "Map invite unsuccessful - may be because map is full"
-                                        );
-                                      }
+                              postReq(
+                                "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php",
+                                `sn=Hitgrab&hg_is_ajax=1&action=send_invites&map_id=${mapId}&snuids%5B%5D=${data.sn_user_id}&uh=${user.unique_hash}&last_read_journal_entry_id=${lastReadJournalEntryId}`
+                              ).then(res2 => {
+                                let inviteRes = null;
+                                try {
+                                  if (res2) {
+                                    inviteRes = JSON.parse(res2.responseText);
+                                    if (inviteRes.success === 1) {
+                                      refreshButton.click();
+                                    } else {
+                                      alert(
+                                        "Map invite unsuccessful - may be because map is full"
+                                      );
                                     }
-                                  } catch (error2) {
-                                    alert("Error while inviting hunter to map");
-                                    console.error(error2.stack);
                                   }
-                                });
-                              }
+                                } catch (error2) {
+                                  alert("Error while inviting hunter to map");
+                                  console.error(error2.stack);
+                                }
+                              });
+                            }
+                          } else {
+                            if (data.name) {
+                              alert(
+                                `${data.name} cannot to be invited to a map at this time`
+                              );
                             } else {
-                              if (data.name) {
-                                alert(
-                                  `${data.name} cannot to be invited to a map at this time`
-                                );
-                              } else {
-                                alert("Invalid hunter information");
-                              }
+                              alert("Invalid hunter information");
                             }
                           }
-                        } catch (error) {
-                          alert("Error while requesting hunter information");
-                          console.error(error.stack);
                         }
-                      });
-                    }
+                      } catch (error) {
+                        alert("Error while requesting hunter information");
+                        console.error(error.stack);
+                      }
+                    });
                   }
                 }
-              });
+              }
+            });
 
-              const span = document.createElement("span");
-              span.className = "tsitu-mapping";
-              span.style.display = "inline-block";
-              span.style.marginBottom = "10px";
-              span.style.marginLeft = "10px";
-              span.appendChild(inputLabel);
-              span.appendChild(inputField);
-              span.appendChild(inviteButton);
+            const span = document.createElement("span");
+            span.className = "tsitu-mapping";
+            span.style.display = "inline-block";
+            span.style.marginBottom = "10px";
+            span.style.marginLeft = "10px";
+            span.appendChild(inputLabel);
+            span.appendChild(inputField);
+            span.appendChild(inviteButton);
 
-              masterEl.insertAdjacentElement(
-                "afterbegin",
-                document.createElement("br")
-              );
-              masterEl.insertAdjacentElement("afterbegin", span);
-            }
+            masterEl.insertAdjacentElement(
+              "afterbegin",
+              document.createElement("br")
+            );
+            masterEl.insertAdjacentElement("afterbegin", span);
           }
         }
 
