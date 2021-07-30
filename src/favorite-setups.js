@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.5.2
+// @version      1.5.3
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -90,9 +90,10 @@
                   // Isle Idol edge case
                   arr[0] = 1127;
                   key = "Isle Idol Trap";
-                } else if (el.name.indexOf("School of Sharks") >= 0) {
-                  key = "School of Sharks";
                 }
+                // else if (el.name.indexOf("School of Sharks") >= 0) {
+                // key = "School of Sharks";
+                // }
               }
 
               ownedItems[el.classification][key] = arr;
@@ -164,9 +165,9 @@
 
         // Edge case `user` checks
         let userWeapon = user.weapon_name;
-        if (userWeapon === "School of Sharks Trap") {
-          userWeapon = "School of Sharks";
-        }
+        // if (userWeapon === "School of Sharks Trap") {
+        // userWeapon = "School of Sharks";
+        // }
 
         // Diff current setup with proposed batch to minimize server load
         const diff = {};
@@ -351,13 +352,16 @@
       saveButton.style.fontWeight = "bold";
       saveButton.textContent = "Save Setup";
       saveButton.onclick = function () {
-        const bait = document.querySelector("#favorite-setup-input-cheese")
-          .value;
+        const bait = document.querySelector(
+          "#favorite-setup-input-cheese"
+        ).value;
         const base = document.querySelector("#favorite-setup-input-base").value;
-        const weapon = document.querySelector("#favorite-setup-input-weapon")
-          .value;
-        const charm = document.querySelector("#favorite-setup-input-charm")
-          .value;
+        const weapon = document.querySelector(
+          "#favorite-setup-input-weapon"
+        ).value;
+        const charm = document.querySelector(
+          "#favorite-setup-input-charm"
+        ).value;
         // const skin = document.querySelector("#favorite-setup-input-skin").value;
         const name = document.querySelector("#favorite-setup-name").value;
 
@@ -410,9 +414,9 @@
       loadButton.onclick = function () {
         // Edge case `user` checks
         let userWeapon = user.weapon_name;
-        if (userWeapon === "School of Sharks Trap") {
-          userWeapon = "School of Sharks";
-        }
+        // if (userWeapon === "School of Sharks Trap") {
+        // userWeapon = "School of Sharks";
+        // }
 
         document.querySelector("#favorite-setup-input-cheese").value =
           user.bait_name || "";
