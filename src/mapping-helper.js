@@ -262,7 +262,7 @@
 
     const notifDiv = document.createElement("div");
     notifDiv.className = "notification active";
-    notifDiv.style.left = "300px";
+    notifDiv.style.left = "280px";
     notifDiv.style.top = "-30px";
     notifDiv.style.background = backgroundColor;
     notifDiv.innerText = mouseList.length || 0;
