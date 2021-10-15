@@ -432,6 +432,8 @@
       "Dodging arrows, spears, swords, and spells!": "Fiery Warpath",
       "Investigating what can be built in a workshop.": "Floating Islands",
       "Searching the skies for treasure.": "Floating Islands",
+      "Peering through an oculus.": "Floating Islands",
+      "In the clouds above Hollow Heights.": "Floating Islands",
       "Trapped between two planes of existence.": "Forbidden Grove",
       "Behind heavy stone gates.": "Forbidden Grove",
       "Carefully navigating a subterranean and humid environment.":
