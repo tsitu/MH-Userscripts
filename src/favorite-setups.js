@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         MouseHunt - Favorite Setups
-// @author       Tran Situ (tsitu)
-// @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.5.1
+// @name         MouseHunt - Favorite Setups+
+// @author       Tran Situ (tsitu), asterios
+// @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
+// @version      2.0.0
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
