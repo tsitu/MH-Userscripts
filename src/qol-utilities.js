@@ -2,7 +2,7 @@
 // @name         MouseHunt - QoL Utilities
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.1.2
+// @version      1.1.4
 // @description  Miscellaneous utilities to turbo-charge your MH experience
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -10,10 +10,12 @@
 
 (function () {
   /**
+   * IDEA BANK
    * TODO: Alert when sounding horn after unseen trap check (user set 00, 15, 30, 45) to avoid wasted hunt if TC'd something
    * TODO: Track outbound supply transfers
    */
 
+  // Adds direct hunter ID / snuid navigation popup via button on 'Friends' dropdown
   (function hunterIdNav() {
     document
       .querySelectorAll(".tsitu-hunter-id-nav")
@@ -395,6 +397,7 @@
     }
   })();
 
+  // Adds RH location and 'Travel' button directly underneath clue
   (function relicHunterHintTravel() {
     const hintMap = {
       "Standing on the other side of a green and purple portal.":
