@@ -434,6 +434,7 @@
       "Searching the skies for treasure.": "Floating Islands",
       "Peering through an oculus.": "Floating Islands",
       "In the clouds above Hollow Heights.": "Floating Islands",
+      "Watching hunters' dirigibles fly by.": "Floating Islands",
       "Trapped between two planes of existence.": "Forbidden Grove",
       "Behind heavy stone gates.": "Forbidden Grove",
       "Carefully navigating a subterranean and humid environment.":
