@@ -440,6 +440,7 @@
       "Watching hunters' dirigibles fly by.": "Floating Islands",
       "Trapped between two planes of existence.": "Forbidden Grove",
       "Behind heavy stone gates.": "Forbidden Grove",
+      "Reaping what she sowed...": "Foreword Farm",
       "Carefully navigating a subterranean and humid environment.":
         "Fungal Cavern",
       "Deep inside of an infested, glowing, twisting, unending cave of untold riches...":
@@ -482,6 +483,7 @@
       "Keeping a close eye on would-be thieves...": "Muridae Market",
       "Investigating a well-seasoned Gumbo Cheese.": "Nerg Plains",
       "Running through flat fields of greeN.": "Nerg Plains",
+      "Reeling it in...": "Prologue Pond",
       "Enjoying a quick dip in a cheesy bath.": "Queso River",
       "Sipping delicious liquid cheese from a river.": "Queso River",
       "Protecting her ears from the sound of loud pumps.": "Queso River",
