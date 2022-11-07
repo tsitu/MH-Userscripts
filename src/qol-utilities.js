@@ -2,7 +2,7 @@
 // @name         MouseHunt - QoL Utilities
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.1.4
+// @version      1.1.5
 // @description  Miscellaneous utilities to turbo-charge your MH experience
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
