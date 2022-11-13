@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.0.1
+// @version      2.0.2
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -106,7 +106,7 @@ GM_addStyle ( `
   /* set to some transparent color */
   border-color: rgba(0, 0, 0, 0.0);
   transition: border-color 300ms ease-in-out;
-  overflow: auto;
+  overflow: scroll;
   padding-right: 2px;
   margin-bottom: 5px;
 }
