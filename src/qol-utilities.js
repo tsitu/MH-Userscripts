@@ -441,6 +441,7 @@
       "Trapped between two planes of existence.": "Forbidden Grove",
       "Behind heavy stone gates.": "Forbidden Grove",
       "Reaping what she sowed...": "Foreword Farm",
+      "Cultivating a hearty yield...": "Foreword Farm",
       "Carefully navigating a subterranean and humid environment.":
         "Fungal Cavern",
       "Deep inside of an infested, glowing, twisting, unending cave of untold riches...":
@@ -484,6 +485,7 @@
       "Investigating a well-seasoned Gumbo Cheese.": "Nerg Plains",
       "Running through flat fields of greeN.": "Nerg Plains",
       "Reeling it in...": "Prologue Pond",
+      "Choosing the richt tackle...": "Prologue Pond",
       "Enjoying a quick dip in a cheesy bath.": "Queso River",
       "Sipping delicious liquid cheese from a river.": "Queso River",
       "Protecting her ears from the sound of loud pumps.": "Queso River",
@@ -497,6 +499,7 @@
       "Shivering near the edges of the mainland.": "Slushy Shoreline",
       "Walking along the bottom of the Rodentia Ocean.": "Sunken City",
       "Investigating powerful diving equipment.": "Sunken City",
+      "Sitting down at a wooden table...": "Table of Contents",
       "Amongst the triumphant trumpets of master hunters of old.":
         "Tournament Hall",
       "Browsing the rewards of competitive champions.": "Tournament Hall",
