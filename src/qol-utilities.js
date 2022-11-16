@@ -485,7 +485,7 @@
       "Investigating a well-seasoned Gumbo Cheese.": "Nerg Plains",
       "Running through flat fields of greeN.": "Nerg Plains",
       "Reeling it in...": "Prologue Pond",
-      "Choosing the richt tackle...": "Prologue Pond",
+      "Choosing the right tackle...": "Prologue Pond",
       "Enjoying a quick dip in a cheesy bath.": "Queso River",
       "Sipping delicious liquid cheese from a river.": "Queso River",
       "Protecting her ears from the sound of loud pumps.": "Queso River",
