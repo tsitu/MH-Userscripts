@@ -500,6 +500,7 @@
       "Walking along the bottom of the Rodentia Ocean.": "Sunken City",
       "Investigating powerful diving equipment.": "Sunken City",
       "Sitting down at a wooden table...": "Table of Contents",
+      "Creating clever characters...": "Table of Contents",
       "Amongst the triumphant trumpets of master hunters of old.":
         "Tournament Hall",
       "Browsing the rewards of competitive champions.": "Tournament Hall",
