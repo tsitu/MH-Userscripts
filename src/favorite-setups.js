@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.1.0
+// @version      2.2.0
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -12,21 +12,20 @@ GM_addStyle ( `
 #tsitu-fave-setups {
   background-color: #F5F5F5;
   position: fixed;
-  z-index: 42;
+  z-index: 69420;
   left: 5px;
   top: 5px;
   border: solid 3px #696969;
   padding: 10px;
   text-align: center;
   border-radius: 10px;
-  height: 95vh;
+  max-height: 95vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   font-size: inherit;
   resize: both;
   min-width: min-content;
-  min-height: 25vh;
 }
 }
 #tsitu-fave-setups button {
@@ -106,7 +105,7 @@ GM_addStyle ( `
   /* set to some transparent color */
   border-color: rgba(0, 0, 0, 0.0);
   transition: border-color 300ms ease-in-out;
-  overflow: scroll;
+  overflow-y: scroll;
   padding-right: 2px;
   margin-bottom: 5px;
 }
@@ -756,9 +755,9 @@ GM_addStyle ( `
       setupSelectorInput.setAttribute("placeholder", "Jump to setup:");
       setupSelectorInput.setAttribute("list", "favorite-setup-selector");
       setupSelectorInput.oninput = function () {
+		  console.log('testing selector input');
         const name = setupSelectorInput.value;
-        if (savedSetups[name] !== undefined) {
-          const rows = document.querySelectorAll("tr.tsitu-fave-setup-row");
+        if (savedSetups[name] !== undefined) {          const rows = document.querySelectorAll("tr.tsitu-fave-setup-row");
           rows.forEach(el => {
             el.style.backgroundColor = "";
           });
@@ -1105,6 +1104,20 @@ GM_addStyle ( `
       mainDiv.appendChild(scroller);
       mainDiv.appendChild(toggleSort);
       document.body.appendChild(mainDiv);
+
+		const resizeObserver = new ResizeObserver(entries => {
+			for (let entry of entries) {
+				// console.log(`${entry.target.style.height} h + ${entry.target.style.width} w`);
+				localStorage.setItem("favorite-setup-saved-height",entry.target.style.height);
+				localStorage.setItem("favorite-setup-saved-width",entry.target.style.width);
+			}
+		});
+
+		resizeObserver.observe(mainDiv);
+
+		mainDiv.style.height = localStorage.getItem("favorite-setup-saved-height");
+		mainDiv.style.width = localStorage.getItem("favorite-setup-saved-width");
+
       dragElement(mainDiv, topDiv);
 
       // Reposition popup based on previous dragged location
