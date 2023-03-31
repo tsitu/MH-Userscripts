@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.0.2
+// @version      2.1.0
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -207,7 +207,7 @@ GM_addStyle ( `
 #imgSpan img {
   max-height: 100%;
   max-width: 100%;
-   height: 3.2vh; /* change this to change the overall size which should scale with this */
+  height: 3.2vh; /* change this to change the overall size which should scale with this */
 //   width: auto;
 //   object-fit: scale-down;
   margin-bottom: -3px;
@@ -310,6 +310,19 @@ GM_addStyle ( `
       };
   };
   xhr.send();
+
+	// Re-render on location change
+	const travelObserver = XMLHttpRequest.prototype.open;
+	XMLHttpRequest.prototype.open = function () {
+		this.addEventListener('load', function () {
+			if (this.responseURL == `https://www.mousehuntgame.com/managers/ajax/users/changeenvironment.php`) {
+				console.log('Travel detected');
+				render();
+				render();
+			}
+		})
+		travelObserver.apply(this, arguments);
+	}
 
   const originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function () {
@@ -487,6 +500,7 @@ GM_addStyle ( `
             await hg.utils.TrapControl.disarmItem(classification).go();
           } else {
             await hg.utils.TrapControl.armItem(id, classification).go();
+              // console.log(id, classification);
             // const testEl = document.createElement("a");
             // testEl.setAttribute("data-item-id", id);
             // console.log(testEl);
