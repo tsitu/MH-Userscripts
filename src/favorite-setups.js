@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.3.2
+// @version      2.3.3
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -12,7 +12,7 @@ GM_addStyle ( `
 #tsitu-fave-setups {
   background-color: #F5F5F5;
   position: fixed;
-  z-index: 69420;
+  z-index: 69;
   left: 5px;
   top: 5px;
   border: solid 3px #696969;
@@ -1249,9 +1249,7 @@ GM_addStyle ( `
 	}
 	// retain previous open/close behaviour
 	var openedSettings = localStorage.getItem('showSetups');
-	console.log(openedSettings);
 	if(openedSettings == "Y") {
-		console.log('test2');
 		toggleRender();
 	}
 	injectUI();
