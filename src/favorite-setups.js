@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.2.0
+// @version      2.2.2
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -754,59 +754,60 @@ GM_addStyle ( `
       setupSelectorInput.className =  "favInput";
       setupSelectorInput.setAttribute("placeholder", "Jump to setup:");
       setupSelectorInput.setAttribute("list", "favorite-setup-selector");
-      setupSelectorInput.oninput = function () {
-		  console.log('testing selector input');
-        const name = setupSelectorInput.value;
-        if (savedSetups[name] !== undefined) {          const rows = document.querySelectorAll("tr.tsitu-fave-setup-row");
-          rows.forEach(el => {
-            el.style.backgroundColor = "";
-          });
+		setupSelectorInput.oninput = function () {
+			const name = setupSelectorInput.value;
+			if (savedSetups[name] !== undefined) {
+				// remove background color for all setups (other than the banding)
+				const rows = document.querySelectorAll("tr.tsitu-fave-setup-row");
+				rows.forEach(el => {
+					el.style.backgroundColor = "";
+				});
 
-          /**
+				/**
            * Return row element that matches dropdown setup name
            * @param {string} name Dropdown setup name
            * @return {HTMLElement|false} <tr> that should be highlighted and scrolled to
            */
-          function findElement(name) {
-            for (let el of rows) {
-              const spans = el.querySelectorAll("span");
-              if (spans.length === 2) {
-                if (name === spans[0].textContent) {
-                  return el;
-                }
-              }
-            }
+				function findElement(name) {
+					for (let el of rows) {
+						const spans = el.querySelectorAll("span");
+						if (spans.length === 1) {
+							if (name === spans[0].textContent) {
+								return el;
+							}
+						}
+					}
 
-            return false;
-          }
+					return false;
+				}
 
-          // Calculate index for nth-child
-          const targetEl = findElement(name);
-          let nthChildValue = 0;
-          for (let i = 0; i < rows.length; i++) {
-            const el = rows[i];
-            if (el === targetEl) {
-              nthChildValue = i + 1;
-              break;
-            }
-          }
+				// Calculate index for nth-child
+				const targetEl = findElement(name);
+				let nthChildValue = 0;
+				for (let i = 0; i < rows.length; i++) {
+					const el = rows[i];
+					if (el === targetEl) {
+						nthChildValue = i + 1;
+						break;
+					}
+				}
 
-          // tr:nth-child value (min = 1)
-          const scrollRow = document.querySelector(
-            `tr.tsitu-fave-setup-row:nth-child(${nthChildValue})`
-          );
-          if (scrollRow) {
-            scrollRow.style.backgroundColor = "#D6EBA1";
-            scrollRow.scrollIntoView({
-              behavior: "auto",
-              block: "nearest",
-              inline: "nearest"
-            });
-          }
+				// tr:nth-child value (min = 1)
+				const scrollRow = document.querySelector(
+					`tr.tsitu-fave-setup-row:nth-child(${nthChildValue})`
+				);
+				if (scrollRow) {
+					scrollRow.style.backgroundColor = "#D6EBA1";
+					scrollRow.scrollIntoView({
+						behavior: "auto",
+						block: "nearest",
+						inline: "nearest"
+					});
+				}
 
-          setupSelectorInput.value = "";
-        }
-      };
+				setupSelectorInput.value = "";
+			}
+		};
 
       const setupSelectorDiv = document.createElement("div");
       setupSelectorDiv.className = "setupSelectorDiv";
@@ -814,7 +815,6 @@ GM_addStyle ( `
       setupSelectorDiv.appendChild(setupSelectorInput);
 
       // TODO: Improve async logic, probably await completion of a component switch otherwise might overlap and/or silently fail
-      // TODO: [high] Location tags on setup creation (checkboxes a la best setups)
       // TODO: [med]  Import/export setup "profiles" (separate dropdown of profiles) (export specific profile obj to dropbox/pastebin?)
       // ^ Profile management could be an elegant bulk grouping solution if done properly
       // TODO: [med]  Mobile UX for drag & drop as well as scrollable div (jquery-ui-touch-punch did not work for simulating touch events)
@@ -835,7 +835,7 @@ GM_addStyle ( `
           //console.log("saved loc: "+savedSetups[name].location, "\n loc bool: "+!!savedSetups[name].location, "\n current loc: "+user.environment_name, "\n current loc bool: "+!!user.environment_name, "\n current loc is saved loc: "+(user.environment_name===savedSetups[name].location), "\n test: "+(!!savedSetups[name].location && user.environment_name == savedSetups[name].location));
           if (user.environment_name === savedSetups[name].location) {
               //console.log("saved loc: "+savedSetups[name].location, "\n loc bool: "+!!savedSetups[name].location, "\n current loc: "+user.environment_name, "\n current loc bool: "+!!user.environment_name, "\n current loc is saved loc: "+(user.environment_name===savedSetups[name].location), "\n test: "+(!!savedSetups[name].location && user.environment_name == savedSetups[name].location));
-              savedSetups[name].sort = -1;
+              savedSetups[name].sort -= 420;
               //console.log("location sorted setup: "+savedSetups[name])
           };
       };
