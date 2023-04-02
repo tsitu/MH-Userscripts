@@ -7,17 +7,17 @@ Allows the import/edit/saving of setups along with their associated locations, f
 Adds a bunch of features and densifies the UI for my personal preference. Differences from tsitu's script:
 
 **Known issues:**
-- jump to setup search doesn't seem to work - FIXED
-- resizing isn't "sticky" across refreshes - FIXED
-- CSoS doesn't work, has to be saved as SoS - FIXED
-- location based auto-sorting gets funky when new setups are added and manual sorts haven't been done yet - partly FIXED
+~~- jump to setup search doesn't seem to work~~ FIXED
+~~- resizing isn't "sticky" across refreshes~~ FIXED
+~~- CSoS doesn't work, has to be saved as SoS~~ FIXED
+- location based auto-sorting gets funky when new setups are added and manual sorts haven't been done yet
 - if you want to help fix these problems or anything else, here's [the script on my github](https://github.com/PersonalPalimpsest/MH-Userscripts/blob/master/src/favorite-setups.js)
 
 **Location-based features:**
 - added location when saving and loading setups, along with a travel button for that location for each setup
-- right click function added to travel buttons to add the current location to a setup. helpful for migrating old setups so you don't have to recreate from scratch
 - auto sorts setups with location = current location to the top. Now updates when you travel
 - only shows the first setup of all locations other than the current one to reduce clutter
+- right click function added to travel buttons to add the current location to a setup. helpful for migrating old setups so you don't have to recreate from scratch
 
 **UX:**
 - 'Arm' button combined with the setup icons
