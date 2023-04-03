@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.3.3
+// @version      2.3.4
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -210,7 +210,7 @@ GM_addStyle ( `
 #imgSpan img {
   max-height: 100%;
   max-width: 100%;
-  height: 3.2vh; /* change this to change the overall size which should scale with this */
+  height: 3vh; /* change this to change the overall size which should scale with this */
 //   width: auto;
 //   object-fit: scale-down;
   margin-bottom: -3px;
@@ -318,7 +318,8 @@ GM_addStyle ( `
 	const travelObserver = XMLHttpRequest.prototype.open;
 	XMLHttpRequest.prototype.open = function () {
 		this.addEventListener('load', function () {
-			if (this.responseURL == `https://www.mousehuntgame.com/managers/ajax/users/changeenvironment.php`) {
+			if (this.responseURL == `https://www.mousehuntgame.com/managers/ajax/users/changeenvironment.php` ||
+				this.responseURL == `https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php`) {
 				console.log('Travel detected');
 				toggleRender();
 				toggleRender();
