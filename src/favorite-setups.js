@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.3.4
+// @version      2.4.0
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -487,44 +487,34 @@ GM_addStyle ( `
 
 					if (diffKeys.length === 0) {
 						return; // Cancel if setup isn't changing
-					} else if (diffKeys.length >= 2) {
-						localStorage.setItem("tsitu-batch-loading", true); // Minimize Mapping Helper TEM requests by setting an in-progress bool
 					}
 
-					function sleep(ms) {
-						return new Promise(resolve => setTimeout(resolve, ms));
-					}
+					// Since we only call `go` once, we dont need to set the batching local storage variable anymore
+					// localStorage.setItem("tsitu-batch-loading", true); // Minimize Mapping Helper TEM requests by setting an in-progress bool
 
-					let counter = 0;
 					for (let classification of diffKeys) {
 						/**
-           * TODO: Investigate bug that de-skins a weapon if you've used mobile app FS to arm a skinless weapon setup
-           * Attempted to emulate browser item selector click by calling `app.pages.CampPage.armItem(element)`
-           * Passed in a "fake" element with data-item-id so that `tmpItem` is derived
-           * Inside `armItem`: 'syncInventory' and/or 'loadItems' fills in 'trapItems' so that 'getItemById' works
-           * Final TrapControl requests seem to be identical with script... so the stuff before might be relevant
-           */
-						counter += 1;
-						if (counter === diffKeys.length) {
-							localStorage.setItem("tsitu-batch-loading", false); // Reset bool in time for last request
-						}
+						 * TODO: Investigate bug that de-skins a weapon if you've used mobile app FS to arm a skinless weapon setup
+						 * Attempted to emulate browser item selector click by calling `app.pages.CampPage.armItem(element)`
+						 * Passed in a "fake" element with data-item-id so that `tmpItem` is derived
+						 * Inside `armItem`: 'syncInventory' and/or 'loadItems' fills in 'trapItems' so that 'getItemById' works
+						 * Final TrapControl requests seem to be identical with script... so the stuff before might be relevant
+						 */
 
 						const id = diff[classification];
 						if (id === "disarm") {
-							await hg.utils.TrapControl.disarmItem(classification).go();
+							hg.utils.TrapControl.disarmItem(classification);
 						} else {
-							await hg.utils.TrapControl.armItem(id, classification).go();
+							hg.utils.TrapControl.armItem(id, classification);
 							// console.log(id, classification);
 							// const testEl = document.createElement("a");
 							// testEl.setAttribute("data-item-id", id);
 							// console.log(testEl);
 							// await app.pages.CampPage.armItem(testEl);
 						}
-						await sleep(420);
 					}
-
-					// Another reset just in case something goes wrong inside the for...of
-					localStorage.setItem("tsitu-batch-loading", false);
+					// Change all the differences in one API call
+					hg.utils.TrapControl.go();
 
 					// Deprecated the old method because unable to prevent userinventory.php calls from syncArmedItems (caused by mobile/regular desync)
 					// Witnessed up to an 18 request simul-slam (at least +1 increments starting from 3 / n-1 duplicates with 1 response's items[] different)
