@@ -2,7 +2,7 @@
 // @name         MouseHunt - QoL Utilities
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.1.6
+// @version      1.1.7
 // @description  Miscellaneous utilities to turbo-charge your MH experience
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -438,10 +438,12 @@
       "Peering through an oculus.": "Floating Islands",
       "In the clouds above Hollow Heights.": "Floating Islands",
       "Watching hunters' dirigibles fly by.": "Floating Islands",
+      "Avoiding falling victim to Sky Pirates.": "Floating Islands",
       "Trapped between two planes of existence.": "Forbidden Grove",
       "Behind heavy stone gates.": "Forbidden Grove",
       "Reaping what she sowed...": "Foreword Farm",
       "Cultivating a hearty yield...": "Foreword Farm",
+      "Toiling away in fertile fields...": "Foreword Farm",
       "Carefully navigating a subterranean and humid environment.":
         "Fungal Cavern",
       "Deep inside of an infested, glowing, twisting, unending cave of untold riches...":
