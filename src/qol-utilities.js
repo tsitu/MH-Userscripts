@@ -410,6 +410,7 @@
       "Ducking between stalls and tents and loud merchants.": "Bazaar",
       "Under the pointiest tent in all the Kingdom!": "Bazaar",
       "Hobnobbing with giants.": "Bountiful Beanstalk",
+      "Infiltrating a lofty castle.": "Bountiful Beanstalk",
       "Taking a relaxing hike through a forested area.": "Calm Clearing",
       "By a peaceful rock in a grassy clearing.": "Calm Clearing",
       "Tucked behind dense trees where it's quiet and peaceful.":
