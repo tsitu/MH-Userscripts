@@ -2,7 +2,7 @@
 // @name         MouseHunt - TEM Catch Stats
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.8.4
+// @version      1.8.5
 // @description  Adds catch/crown statistics next to mouse names on the TEM
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -19,48 +19,27 @@
     ".campPage-trap-trapEffectiveness-content::-webkit-scrollbar { width: 0px; }" // Chrome / Safari / Opera
   );
 
+  function mutationCallback() {
+    const labels = document.getElementsByClassName(
+      "campPage-trap-trapEffectiveness-difficultyGroup-label"
+    );
+
+    // Render if difficulty labels are in DOM
+    if (labels.length > 0) {
+      render();
+    }
+  }
+
   // Observers are attached to a *specific* element (will DC if removed from DOM)
   const observerTarget = document.querySelector(
     ".mousehuntHud-page-tabContentContainer"
   );
-  if (observerTarget) {
-    MutationObserver =
-      window.MutationObserver ||
+  const MutationObserver = window.MutationObserver ||
       window.WebKitMutationObserver ||
       window.MozMutationObserver;
+  const observer = new MutationObserver(mutationCallback);
 
-    function mutationCallback() {
-      const labels = document.getElementsByClassName(
-        "campPage-trap-trapEffectiveness-difficultyGroup-label"
-      );
-      const blueprintContainer = document.querySelector(
-        ".campPage-trap-blueprintContainer"
-      );
-
-      // Render if difficulty labels are in DOM
-      if (labels.length > 0) {
-        // Disconnect and reconnect later to prevent infinite mutation loop
-        observer.disconnect();
-
-        // Clear out old elements
-        // Uses static collection instead of live one from getElementsByClassName
-        document
-          .querySelectorAll(".tsitu-tem-catches")
-          .forEach(el => el.remove());
-
-        render();
-
-        observer.observe(observerTarget, {
-          childList: true,
-          subtree: true
-        });
-      }
-    }
-
-    const observer = new MutationObserver(function () {
-      mutationCallback();
-    });
-
+  if (observerTarget) {
     observer.observe(observerTarget, {
       childList: true,
       subtree: true
@@ -118,6 +97,9 @@
   }
 
   function render() {
+    // Disconnect and reconnect later to prevent infinite mutation loop
+    observer.disconnect();
+
     // Track crown counts
     let mouseCount = 0;
     const crownYes = {
@@ -134,6 +116,12 @@
       platinum: [0, "#3f4682"],
       diamond: [0, "#79aebd"]
     };
+
+    // Clear out old elements
+    // Uses static collection instead of live one from getElementsByClassName
+    document
+      .querySelectorAll(".tsitu-tem-catches")
+      .forEach(el => el.remove());
 
     // Render crown image and catch number next to mouse name
     const rawStore = localStorage.getItem("mh-catch-stats");
@@ -359,6 +347,11 @@
       "campPage-trap-trapEffectiveness-content"
     )[0];
     if (container) container.appendChild(bottomDiv);
+
+    observer.observe(observerTarget, {
+      childList: true,
+      subtree: true
+    });
   }
 
   /**
@@ -380,9 +373,7 @@
           localStorage.setItem("mh-catch-stats", JSON.stringify(catchData));
           localStorage.setItem("mh-catch-stats-timestamp", Date.now());
 
-          // Close and reopen to update badges (prevents infinite render loop)
-          app.pages.CampPage.closeBlueprintDrawer();
-          app.pages.CampPage.toggleTrapEffectiveness(true);
+          render();
         }
       }
     } catch (error) {
