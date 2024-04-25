@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.4.1
+// @version      2.5.1
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -1221,16 +1221,17 @@ GM_addStyle ( `
 				target.appendChild(div);
 			}
 		} else {
-			const target = document.querySelector(".mousehuntHud-gameInfo");
+			const target = document.querySelector(".mousehuntHeaderView-dropdownContainer");
 			if (target) {
-				const link = document.createElement("a");
-				link.id = "fave-setup-button";
-				link.innerText = "[Favorite Setups]";
-				link.addEventListener("click", function () {
+				const setupTab = document.createElement("a");
+				setupTab.id = "fave-setup-menu";
+				setupTab.innerHTML = "Setups";
+				setupTab.className = 'menuItem';
+				setupTab.addEventListener("click", function () {
 					toggleRender();
 					return false; // Prevent default link clicked behavior
 				});
-				link.addEventListener("contextmenu", function () {
+				setupTab.addEventListener("contextmenu", function () {
 					if (confirm("Toggle '[Favorite Setups]' placement?")) {
 						localStorage.setItem("favorite-setup-placement", "tem");
 						injectUI();
@@ -1238,7 +1239,7 @@ GM_addStyle ( `
 						localStorage.setItem("favorite-setup-placement", "top");
 					}
 				});
-				target.prepend(link);
+				target.prepend(setupTab);
 			}
 		}
 	}
