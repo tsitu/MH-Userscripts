@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.5.1
+// @version      2.5.2
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -1223,23 +1223,27 @@ GM_addStyle ( `
 		} else {
 			const target = document.querySelector(".mousehuntHeaderView-dropdownContainer");
 			if (target) {
-				const setupTab = document.createElement("a");
-				setupTab.id = "fave-setup-menu";
-				setupTab.innerHTML = "Setups";
-				setupTab.className = 'menuItem';
-				setupTab.addEventListener("click", function () {
-					toggleRender();
-					return false; // Prevent default link clicked behavior
-				});
-				setupTab.addEventListener("contextmenu", function () {
-					if (confirm("Toggle '[Favorite Setups]' placement?")) {
-						localStorage.setItem("favorite-setup-placement", "tem");
-						injectUI();
-					} else {
-						localStorage.setItem("favorite-setup-placement", "top");
-					}
-				});
-				target.prepend(setupTab);
+				// Check if the setup tab already exists
+				let setupTabExists = document.querySelector('#fave-setup-menu');
+				if (!setupTabExists) {
+					const setupTab = document.createElement("a");
+					setupTab.id = "fave-setup-menu";
+					setupTab.innerHTML = "Setups";
+					setupTab.className = 'menuItem';
+					setupTab.addEventListener("click", function () {
+						toggleRender();
+						return false; // Prevent default link clicked behavior
+					});
+					setupTab.addEventListener("contextmenu", function () {
+						if (confirm("Toggle '[Favorite Setups]' placement?")) {
+							localStorage.setItem("favorite-setup-placement", "tem");
+							injectUI();
+						} else {
+							localStorage.setItem("favorite-setup-placement", "top");
+						}
+					});
+					target.prepend(setupTab);
+				}
 			}
 		}
 	}
