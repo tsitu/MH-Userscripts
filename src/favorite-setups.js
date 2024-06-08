@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.5.2
+// @version      2.6.0
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -1243,6 +1243,17 @@ GM_addStyle ( `
 						}
 					});
 					target.prepend(setupTab);
+
+					const m1kTab = document.createElement('a');
+					m1kTab.id = 'm1k-aura-button';
+					m1kTab.innerHTML = 'M1K';
+					m1kTab.className = 'menuItem';
+					m1kTab.addEventListener("click", function () {
+						let auraHrs = parseFloat(prompt('How many hours of aura?'));
+						hg.utils.UserInventory.useConvertible('fulminas_gift_convertible',auraHrs);
+						return false; // Prevent default link clicked behavior
+					});
+					target.prepend(m1kTab);
 				}
 			}
 		}
