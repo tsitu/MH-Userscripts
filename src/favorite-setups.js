@@ -2,11 +2,13 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.6.1
+// @version      2.6.2
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
+// @downloadURL https://update.greasyfork.org/scripts/443164/MouseHunt%20-%20Favorite%20Setups%2B.user.js
+// @updateURL https://update.greasyfork.org/scripts/443164/MouseHunt%20-%20Favorite%20Setups%2B.meta.js
 // ==/UserScript==
 GM_addStyle ( `
 #tsitu-fave-setups {
@@ -1250,7 +1252,9 @@ GM_addStyle ( `
 					m1kTab.className = 'menuItem';
 					m1kTab.addEventListener("click", function () {
 						let auraHrs = parseFloat(prompt('How many hours of aura?'));
-						hg.utils.UserInventory.useConvertible('kilohertz_processor_convertible',auraHrs);
+						if (auraHrs >= 1){
+							hg.utils.UserInventory.useConvertible('kilohertz_processor_convertible',auraHrs);
+						};
 						return false; // Prevent default link clicked behavior
 					});
 					target.prepend(m1kTab);
