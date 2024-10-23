@@ -2,182 +2,181 @@
 // @name         MouseHunt - Mapping Helper
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      2.6.2
+// @version      2.7.0
 // @description  Map interface improvements (invite via Hunter ID, direct send SB+, TEM-based available uncaught map mice)
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
 // ==/UserScript==
 
 (function () {
-  // Endpoint listener - caches maps (which come in one at a time)
-  const originalOpen = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function () {
-    this.addEventListener("load", function () {
-      // Main mapping helper logic
-      if (
-        this.responseURL ===
-        "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php"
-      ) {
-        try {
-          const map = JSON.parse(this.responseText).treasure_map;
-          if (map) {
-            const obj = {};
-            const condensed = {};
-            condensed.hunters = map.hunters;
-            condensed.is_complete = map.is_complete;
-            condensed.is_owner = map.is_owner;
-            condensed.is_scavenger_hunt = map.is_scavenger_hunt;
-            condensed.is_wanted_poster = map.is_wanted_poster;
-            condensed.map_class = map.map_class;
-            condensed.map_id = map.map_id;
-            condensed.timestamp = Date.now();
-            obj[map.name] = condensed;
+  // Likely a maintenance page if no jQuery
+  if (unsafeWindow.$ == null) {
+    return;
+  }
+  const $ = unsafeWindow.$;
 
-            const mapCacheRaw = localStorage.getItem("tsitu-mapping-cache");
-            if (mapCacheRaw) {
-              const mapCache = JSON.parse(mapCacheRaw);
-              mapCache[map.name] = condensed;
-              localStorage.setItem(
-                "tsitu-mapping-cache",
-                JSON.stringify(mapCache)
-              );
-            } else {
-              localStorage.setItem("tsitu-mapping-cache", JSON.stringify(obj));
-            }
+  $(document).on('ajaxSuccess', async function (event, jqXHR, ajaxOptions) {
+    // Main mapping helper logic
+    const responseURL = ajaxOptions.url;
+    const responseJSON = jqXHR.responseJSON; // will be null if 'application/json' is not the Content-Type
 
-            const mapEl = document.querySelector(".treasureMapView-mapMenu");
-            if (mapEl) render();
-          }
-        } catch (error) {
-          console.log("Server response doesn't contain a valid treasure map");
-          console.error(error.stack);
+    if (responseJSON == null) {
+      return;
+    }
+
+    treasureMapHandler(responseURL, responseJSON);
+    temHandler(responseURL, responseJSON);
+
+    // Check whether remaining map mice has updated for the map/TEM feature
+    const rhMap = user.quests.QuestRelicHunter;
+    if (rhMap && rhMap.maps.length > 0) {
+      let currentMap;
+      rhMap.maps.forEach(el => {
+        if (el.map_id === rhMap.default_map_id) {
+          currentMap = el; // Set "Active" map
         }
-      }
+      });
 
-      // Passive TEM update listener
-      if (
-        this.responseURL ===
-        "https://www.mousehuntgame.com/managers/ajax/users/getmiceeffectiveness.php"
-      ) {
-        try {
-          const response = JSON.parse(this.responseText);
-          if (response) updateTEMData(response);
-        } catch (error) {
-          console.log("Error parsing TEM details in passive listener");
-          console.error(error.stack);
-        }
-      }
-
-      // Check whether remaining map mice has updated for the map/TEM feature
-      const rhMap = user.quests.QuestRelicHunter;
-      if (rhMap && rhMap.maps.length > 0) {
-        let currentMap;
-        rhMap.maps.forEach(el => {
-          if (el.map_id === rhMap.default_map_id) {
-            currentMap = el; // Set "Active" map
-          }
-        });
-
-        if (currentMap.name.indexOf("Scavenger") < 0) {
-          const remainStr = currentMap.remaining
-            ? `${currentMap.map_id}~${currentMap.remaining}`
-            : `${currentMap.map_id}~${currentMap.num_found}`;
-          const cacheRemain = localStorage.getItem("tsitu-maptem-remain");
-          if (cacheRemain) {
-            if (remainStr !== cacheRemain) {
-              // Map state has changed - fetch latest data
-              localStorage.setItem("tsitu-maptem-remain", remainStr);
-              updateMapData(currentMap.map_id);
-            } else {
-              // Map state unchanged - default render
-              mapTEMRender();
-            }
-          } else {
-            // Initial cache write
+      if (currentMap.name.indexOf("Scavenger") < 0) {
+        const remainStr = currentMap.remaining
+          ? `${currentMap.map_id}~${currentMap.remaining}`
+          : `${currentMap.map_id}~${currentMap.num_found}`;
+        const cacheRemain = localStorage.getItem("tsitu-maptem-remain");
+        if (cacheRemain) {
+          if (remainStr !== cacheRemain) {
+            // Map state has changed - fetch latest data
             localStorage.setItem("tsitu-maptem-remain", remainStr);
             updateMapData(currentMap.map_id);
+          } else {
+            // Map state unchanged - default render
+            mapTEMRender();
           }
         } else {
-          // Scavenger map detected - reset map data
-          localStorage.removeItem("tsitu-maptem-remain");
-          localStorage.removeItem("tsitu-maptem-mapmice");
-          localStorage.removeItem("tsitu-maptem-cache-color");
-          localStorage.removeItem("tsitu-maptem-cache-data");
-          mapTEMRender();
+          // Initial cache write
+          localStorage.setItem("tsitu-maptem-remain", remainStr);
+          updateMapData(currentMap.map_id);
         }
       } else {
-        // No active maps - reset map data
+        // Scavenger map detected - reset map data
         localStorage.removeItem("tsitu-maptem-remain");
         localStorage.removeItem("tsitu-maptem-mapmice");
         localStorage.removeItem("tsitu-maptem-cache-color");
         localStorage.removeItem("tsitu-maptem-cache-data");
         mapTEMRender();
       }
+    } else {
+      // No active maps - reset map data
+      localStorage.removeItem("tsitu-maptem-remain");
+      localStorage.removeItem("tsitu-maptem-mapmice");
+      localStorage.removeItem("tsitu-maptem-cache-color");
+      localStorage.removeItem("tsitu-maptem-cache-data");
+      mapTEMRender();
+    }
 
-      // Check whether environment/setup has updated for the map/TEM feature
-      const baitID = user.bait_item_id || 0;
-      const charmID = user.trinket_item_id || 0;
-      const envString = `${user.environment_id}~${baitID}~${user.base_item_id}~${user.weapon_item_id}~${charmID}`;
-      const cacheEnv = localStorage.getItem("tsitu-maptem-env");
-      const isBatch = localStorage.getItem("tsitu-batch-loading");
-      if (cacheEnv) {
-        if (envString !== cacheEnv) {
-          // Environment/setup has changed - fetch latest data
-          localStorage.setItem("tsitu-maptem-env", envString);
-          if (isBatch === "true") {
-            // Do nothing - Favorite Setups script is in the middle of multiple item armings
-          } else {
-            requestTEMData();
-          }
+    // Check whether environment/setup has updated for the map/TEM feature
+    const baitID = user.bait_item_id || 0;
+    const charmID = user.trinket_item_id || 0;
+    const envString = `${user.environment_id}~${baitID}~${user.base_item_id}~${user.weapon_item_id}~${charmID}`;
+    const cacheEnv = localStorage.getItem("tsitu-maptem-env");
+    const isBatch = localStorage.getItem("tsitu-batch-loading");
+    if (cacheEnv) {
+      if (envString !== cacheEnv) {
+        // Environment/setup has changed - fetch latest data
+        localStorage.setItem("tsitu-maptem-env", envString);
+        if (isBatch === "true") {
+          // Do nothing - Favorite Setups script is in the middle of multiple item armings
         } else {
-          // Environment/setup state unchanged - default render
-          mapTEMRender();
+          requestTEMData();
         }
       } else {
-        // Initial cache write
-        localStorage.setItem("tsitu-maptem-env", envString);
-        requestTEMData();
+        // Environment/setup state unchanged - default render
+        mapTEMRender();
       }
-    });
-    originalOpen.apply(this, arguments);
-  };
+    } else {
+      // Initial cache write
+      localStorage.setItem("tsitu-maptem-env", envString);
+      requestTEMData();
+    }
+  });
+
+  function treasureMapHandler(url, data) {
+    if (url !== "https://www.mousehuntgame.com/managers/ajax/users/treasuremap_v2.php") {
+      return;
+    }
+
+    try {
+      const map = data.treasure_map;
+      if (map) {
+        const obj = {};
+        const condensed = {};
+        condensed.hunters = map.hunters;
+        condensed.is_complete = map.is_complete;
+        condensed.is_owner = map.is_owner;
+        condensed.is_scavenger_hunt = map.is_scavenger_hunt;
+        condensed.is_wanted_poster = map.is_wanted_poster;
+        condensed.map_class = map.map_class;
+        condensed.map_id = map.map_id;
+        condensed.timestamp = Date.now();
+        obj[map.name] = condensed;
+
+        const mapCacheRaw = localStorage.getItem("tsitu-mapping-cache");
+        if (mapCacheRaw) {
+          const mapCache = JSON.parse(mapCacheRaw);
+          mapCache[map.name] = condensed;
+          localStorage.setItem(
+            "tsitu-mapping-cache",
+            JSON.stringify(mapCache)
+          );
+        } else {
+          localStorage.setItem("tsitu-mapping-cache", JSON.stringify(obj));
+        }
+
+        const mapEl = document.querySelector(".treasureMapView-mapMenu");
+        if (mapEl) {
+          render();
+        }
+      }
+    } catch (error) {
+      console.log("Server response doesn't contain a valid treasure map");
+      console.error(error.stack);
+    }
+  }
+
+  function temHandler(url, data) {
+    if (url !== "https://www.mousehuntgame.com/managers/ajax/users/getmiceeffectiveness.php") {
+      return;
+    }
+
+    updateTEMData(data);
+  }
 
   // Queries and caches uncaught mice on an active treasure map
   function updateMapData(mapId) {
-    postReq(
-      "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php",
-      `sn=Hitgrab&hg_is_ajax=1&action=map_info&map_id=${mapId}&uh=${user.unique_hash}`
-    ).then(res => {
-      let response = null;
-      try {
-        if (res) {
-          response = JSON.parse(res.responseText);
-          const missingMice = [];
-          const mapData = response.treasure_map;
-          if (mapData.goals.mouse.length > 0 && mapData.hunters.length > 0) {
-            const completedIDs = [];
-            mapData.hunters.forEach(el => {
-              const caughtMice = el.completed_goal_ids.mouse;
-              if (caughtMice.length > 0) {
-                caughtMice.forEach(id => completedIDs.push(id));
-              }
-            });
-            mapData.goals.mouse.forEach(el => {
-              if (completedIDs.indexOf(el.unique_id) < 0) {
-                missingMice.push(el.name);
-              }
-            });
-            localStorage.setItem(
-              "tsitu-maptem-mapmice",
-              JSON.stringify(missingMice)
-            );
-            mapTEMCompare();
+    hg.utils.TreasureMapUtil.getMapInfo(mapId, function (response) {
+      const missingMice = [];
+      const mapData = response.treasure_map;
+      if (mapData.goals.mouse.length > 0 && mapData.hunters.length > 0) {
+        const completedIDs = [];
+        mapData.hunters.forEach(el => {
+          const caughtMice = el.completed_goal_ids.mouse;
+          if (caughtMice.length > 0) {
+            caughtMice.forEach(id => completedIDs.push(id));
           }
-        }
-      } catch (error) {
-        console.log("Error while requesting treasure map details");
-        console.error(error.stack);
+        });
+        mapData.goals.mouse.forEach(el => {
+          if (completedIDs.indexOf(el.unique_id) < 0) {
+            missingMice.push(el.name);
+          }
+        });
+        localStorage.setItem(
+          "tsitu-maptem-mapmice",
+          JSON.stringify(missingMice)
+        );
+        mapTEMCompare();
       }
+    }, function (errorResponse) {
+      console.log("Error while requesting treasure map details");
+      console.error(error.stack);
     });
   }
 
@@ -343,7 +342,7 @@
     masterEl.style.border = "1px";
     masterEl.style.borderStyle = "dotted";
     const masterElLegend = document.createElement("legend");
-    masterElLegend.innerText = "Mapping Helper v2.6.1 by tsitu";
+    masterElLegend.innerText = `Mapping Helper v${GM_info.script.version} by tsitu`;
     masterEl.appendChild(masterElLegend);
 
     /**
@@ -491,7 +490,7 @@
               if (rawText.length > 0) {
                 const hunterId = parseInt(rawText);
                 if (typeof hunterId === "number" && !isNaN(hunterId)) {
-                  if (hunterId > 0 && hunterId < 9999999) {
+                  if (hunterId > 0 && hunterId < 99999999) {
                     postReq(
                       "https://www.mousehuntgame.com/managers/ajax/pages/friends.php",
                       `sn=Hitgrab&hg_is_ajax=1&action=community_search_by_id&user_id=${hunterId}&uh=${user.unique_hash}`
@@ -510,26 +509,16 @@
                                 `Are you sure you'd like to invite this hunter?\n\nName: ${data.name}\nTitle: ${data.title_name} (${data.title_percent}%)\nLocation: ${data.environment_name}\nLast Active: ${data.last_active_formatted} ago`
                               )
                             ) {
-                              postReq(
-                                "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php",
-                                `sn=Hitgrab&hg_is_ajax=1&action=send_invites&map_id=${mapId}&snuids%5B%5D=${data.sn_user_id}&uh=${user.unique_hash}&last_read_journal_entry_id=${lastReadJournalEntryId}`
-                              ).then(res2 => {
-                                let inviteRes = null;
-                                try {
-                                  if (res2) {
-                                    inviteRes = JSON.parse(res2.responseText);
-                                    if (inviteRes.success === 1) {
-                                      refreshButton.click();
-                                    } else {
-                                      alert(
-                                        "Map invite unsuccessful - may be because map is full"
-                                      );
-                                    }
-                                  }
-                                } catch (error2) {
-                                  alert("Error while inviting hunter to map");
-                                  console.error(error2.stack);
+                              hg.utils.TreasureMapUtil.sendInvites(mapId, [data.sn_user_id], function (inviteRes) {
+                                if (inviteRes.success === 1) {
+                                  refreshButton.click();
+                                } else {
+                                  alert(
+                                    "Map invite unsuccessful - may be because map is full"
+                                  );
                                 }
+                              }, function (errorResponse) {
+                                alert("Map invite unsuccessful - may be because map is full");
                               });
                             }
                           } else {
