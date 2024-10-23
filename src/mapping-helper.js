@@ -2,7 +2,7 @@
 // @name         MouseHunt - Mapping Helper
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      2.6.1
+// @version      2.6.2
 // @description  Map interface improvements (invite via Hunter ID, direct send SB+, TEM-based available uncaught map mice)
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -263,7 +263,7 @@
     const notifDiv = document.createElement("div");
     notifDiv.className = "notification active";
     notifDiv.style.left = "300px";
-    notifDiv.style.top = "-30px";
+    notifDiv.style.top = "-55px";
     notifDiv.style.background = backgroundColor;
     notifDiv.innerText = mouseList.length || 0;
 
@@ -415,8 +415,9 @@
         ".treasureMapRootView-tab.active"
       );
       if (tabHeader) {
-        mapName = tabHeader.querySelector(".treasureMapRootView-tab-name")
-          .textContent;
+        mapName = tabHeader.querySelector(
+          ".treasureMapRootView-tab-name"
+        ).textContent;
       } else {
         // Tab header disappears when only 1 map is open, so fall back to HUD label
         const hudLabel = document.querySelector(
