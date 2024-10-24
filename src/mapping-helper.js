@@ -261,8 +261,8 @@
 
     const notifDiv = document.createElement("div");
     notifDiv.className = "notification active";
-    notifDiv.style.left = "300px";
-    notifDiv.style.top = "-55px";
+    notifDiv.style.left = "315px";
+    notifDiv.style.top = "-30px";
     notifDiv.style.background = backgroundColor;
     notifDiv.innerText = mouseList.length || 0;
 
@@ -342,7 +342,7 @@
     masterEl.style.border = "1px";
     masterEl.style.borderStyle = "dotted";
     const masterElLegend = document.createElement("legend");
-    masterElLegend.innerText = "Mapping Helper v2.6.1 by tsitu";
+    masterElLegend.innerText = `Mapping Helper v${GM_info.script.version} by tsitu`;
     masterEl.appendChild(masterElLegend);
 
     /**
@@ -490,7 +490,7 @@
               if (rawText.length > 0) {
                 const hunterId = parseInt(rawText);
                 if (typeof hunterId === "number" && !isNaN(hunterId)) {
-                  if (hunterId > 0 && hunterId < 9999999) {
+                  if (hunterId > 0 && hunterId < 99999999) {
                     postReq(
                       "https://www.mousehuntgame.com/managers/ajax/pages/friends.php",
                       `sn=Hitgrab&hg_is_ajax=1&action=community_search_by_id&user_id=${hunterId}&uh=${user.unique_hash}`
