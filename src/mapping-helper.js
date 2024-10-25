@@ -382,8 +382,8 @@
       // Close dialog and re-open with either current map or overview
       document.getElementById("jsDialogClose").click();
       mapId === -1
-        ? hg.controllers.TreasureMap.show()
-        : hg.controllers.TreasureMap.show(mapId);
+        ? hg.controllers.TreasureMapController.show()
+        : hg.controllers.TreasureMapController.show(mapId);
     });
 
     refreshSpan.appendChild(refreshButton);
