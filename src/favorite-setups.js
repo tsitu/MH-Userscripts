@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.6.2
+// @version      2.7.0
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -289,32 +289,43 @@ GM_addStyle ( `
 		location: 6
 	};
 
-	// Pull and save location list
-	const xhr = new XMLHttpRequest();
-	xhr.open(
-		"POST",
-		`https://www.mousehuntgame.com/managers/ajax/pages/page.php?page_class=HunterProfile&page_arguments%5Btab%5D=mice&page_arguments%5Bsub_tab%5D=location&uh=${user.unique_hash}`
-	);
-	xhr.onload = function () {
-		const response = JSON.parse(xhr.responseText);
-		const locations =
-			  response.page.tabs.mice.subtabs[1].mouse_list.categories;
-		if (locations) {
-			const masterObj = {};
+	const currentVersion = '2.7.0'; // Update this version number when you update the script
+	const storedVersion = localStorage.getItem('ast-location-script-version');
 
-			locations.forEach(el => {
-				const obj = {};
-				obj["type"] = el.type;
-				masterObj[el.name] = obj;
-			});
+	if (!storedVersion || storedVersion !== currentVersion) {
+		// Pull and save location list
+		const xhr = new XMLHttpRequest();
+		xhr.open(
+			"POST",
+			`https://www.mousehuntgame.com/managers/ajax/pages/page.php?page_class=HunterProfile&page_arguments%5Btab%5D=mice&page_arguments%5Bsub_tab%5D=location&uh=${user.unique_hash}`
+		);
+		xhr.onload = function () {
+			const response = JSON.parse(xhr.responseText);
+			const locations =
+				  response.page.tabs.mice.subtabs[1].mouse_list.categories;
+			if (locations) {
+				const masterObj = {};
 
-			localStorage.setItem(
-				"ast-location-mapping",
-				JSON.stringify(masterObj)
-			);
+				locations.forEach(el => {
+					const obj = {};
+					obj["type"] = el.type;
+					masterObj[el.name] = obj;
+				});
+
+				localStorage.setItem(
+					"ast-location-mapping",
+					JSON.stringify(masterObj)
+				);
+			};
 		};
-	};
-	xhr.send();
+		xhr.send();
+
+
+		// Update the stored version
+		localStorage.setItem("ast-location-script-version", currentVersion);
+	} else {
+		console.log("Script is up-to-date, skipping location update.");
+	}
 
 	// Re-render on location change
 	const travelObserver = XMLHttpRequest.prototype.open;
