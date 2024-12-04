@@ -2,7 +2,7 @@
 // @name         MouseHunt - Favorite Setups+
 // @author       PersonalPalimpsest (asterios)
 // @namespace    https://greasyfork.org/en/users/900615-personalpalimpsest
-// @version      2.7.0
+// @version      2.7.3
 // @description  Unlimited custom favorite trap setups!
 // @grant        GM_addStyle
 // @match        http://www.mousehuntgame.com/*
@@ -38,6 +38,7 @@ GM_addStyle ( `
     font-weight: bold;
     font-size: 160%;
     text-decoration: underline;
+	color: black;
 }
 
 #tsitu-fave-setups #close-button {
@@ -184,6 +185,7 @@ GM_addStyle ( `
     padding-top: 3px;
     padding-left: 3px;
     margin-right: -1px;
+	color: black;
 }
 .travelButton {
     grid-area: b;
@@ -333,7 +335,7 @@ GM_addStyle ( `
 		this.addEventListener('load', function () {
 			try {
 				if (this.responseURL == `https://www.mousehuntgame.com/managers/ajax/users/changeenvironment.php` ||
-					this.responseURL == `https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php` && JSON.parse(this.responseText).journal_markup[0].render_data.css_class == 'entry short travel'
+					this.responseURL == `https://www.mousehuntgame.com/managers/ajax/users/treasuremap_v2.php` && JSON.parse(this.responseText).journal_markup[0].render_data.css_class == 'entry short travel'
 				   ) {
 					console.log('Travel detected');
 					toggleRender();
@@ -824,8 +826,8 @@ GM_addStyle ( `
 							scrollRow.style.backgroundColor = "#D6EBA1";
 							scrollRow.scrollIntoView({
 								behavior: "auto",
-								block: "nearest",
-								inline: "nearest"
+								block: "start",
+								inline: "start"
 							});
 						}
 
