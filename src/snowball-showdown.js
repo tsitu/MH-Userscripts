@@ -2,7 +2,7 @@
 // @name         MouseHunt - Snowball Showdown Helper
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      1.3.1
+// @version      1.3.2
 // @description  Tool to help with Snowball Showdown puzzle boards
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
