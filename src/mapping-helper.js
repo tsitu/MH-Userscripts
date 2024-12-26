@@ -2,7 +2,7 @@
 // @name         MouseHunt - Mapping Helper
 // @author       Tran Situ (tsitu)
 // @namespace    https://greasyfork.org/en/users/232363-tsitu
-// @version      2.6.2
+// @version      2.7.0
 // @description  Map interface improvements (invite via Hunter ID, direct send SB+, TEM-based available uncaught map mice)
 // @match        http://www.mousehuntgame.com/*
 // @match        https://www.mousehuntgame.com/*
@@ -13,60 +13,17 @@
   const originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function () {
     this.addEventListener("load", function () {
-      // Main mapping helper logic
-      if (
-        this.responseURL ===
-        "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php"
-      ) {
-        try {
-          const map = JSON.parse(this.responseText).treasure_map;
-          if (map) {
-            const obj = {};
-            const condensed = {};
-            condensed.hunters = map.hunters;
-            condensed.is_complete = map.is_complete;
-            condensed.is_owner = map.is_owner;
-            condensed.is_scavenger_hunt = map.is_scavenger_hunt;
-            condensed.is_wanted_poster = map.is_wanted_poster;
-            condensed.map_class = map.map_class;
-            condensed.map_id = map.map_id;
-            condensed.timestamp = Date.now();
-            obj[map.name] = condensed;
-
-            const mapCacheRaw = localStorage.getItem("tsitu-mapping-cache");
-            if (mapCacheRaw) {
-              const mapCache = JSON.parse(mapCacheRaw);
-              mapCache[map.name] = condensed;
-              localStorage.setItem(
-                "tsitu-mapping-cache",
-                JSON.stringify(mapCache)
-              );
-            } else {
-              localStorage.setItem("tsitu-mapping-cache", JSON.stringify(obj));
-            }
-
-            const mapEl = document.querySelector(".treasureMapView-mapMenu");
-            if (mapEl) render();
-          }
-        } catch (error) {
-          console.log("Server response doesn't contain a valid treasure map");
-          console.error(error.stack);
-        }
+      const url = this.responseURL;
+      let data = this.responseText;
+      try {
+          data = JSON.parse(data);
+      } catch (error) {
+        // Ignore non-JSON responses
+        return;
       }
 
-      // Passive TEM update listener
-      if (
-        this.responseURL ===
-        "https://www.mousehuntgame.com/managers/ajax/users/getmiceeffectiveness.php"
-      ) {
-        try {
-          const response = JSON.parse(this.responseText);
-          if (response) updateTEMData(response);
-        } catch (error) {
-          console.log("Error parsing TEM details in passive listener");
-          console.error(error.stack);
-        }
-      }
+      treasureMapListener(url, data);
+      temListener(url, data);
 
       // Check whether remaining map mice has updated for the map/TEM feature
       const rhMap = user.quests.QuestRelicHunter;
@@ -142,42 +99,84 @@
     originalOpen.apply(this, arguments);
   };
 
+  function treasureMapListener(url, data) {
+    if (url !== "https://www.mousehuntgame.com/managers/ajax/users/treasuremap_v2.php") {
+      return;
+    }
+
+    try {
+      const map = data.treasure_map;
+      if (map) {
+        const obj = {};
+        const condensed = {};
+        condensed.hunters = map.hunters;
+        condensed.is_complete = map.is_complete;
+        condensed.is_owner = map.is_owner;
+        condensed.is_scavenger_hunt = map.is_scavenger_hunt;
+        condensed.is_wanted_poster = map.is_wanted_poster;
+        condensed.map_class = map.map_class;
+        condensed.map_id = map.map_id;
+        condensed.timestamp = Date.now();
+        obj[map.name] = condensed;
+
+        const mapCacheRaw = localStorage.getItem("tsitu-mapping-cache");
+        if (mapCacheRaw) {
+          const mapCache = JSON.parse(mapCacheRaw);
+          mapCache[map.name] = condensed;
+          localStorage.setItem(
+            "tsitu-mapping-cache",
+            JSON.stringify(mapCache)
+          );
+        } else {
+          localStorage.setItem("tsitu-mapping-cache", JSON.stringify(obj));
+        }
+
+        const mapEl = document.querySelector(".treasureMapView-mapMenu");
+        if (mapEl) {
+          render();
+        }
+      }
+    } catch (error) {
+      console.log("Server response doesn't contain a valid treasure map");
+      console.error(error.stack);
+    }
+  }
+
+  function temListener(url, data) {
+    if (url !== "https://www.mousehuntgame.com/managers/ajax/users/getmiceeffectiveness.php") {
+      return;
+    }
+
+    updateTEMData(data);
+  }
+
   // Queries and caches uncaught mice on an active treasure map
   function updateMapData(mapId) {
-    postReq(
-      "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php",
-      `sn=Hitgrab&hg_is_ajax=1&action=map_info&map_id=${mapId}&uh=${user.unique_hash}`
-    ).then(res => {
-      let response = null;
-      try {
-        if (res) {
-          response = JSON.parse(res.responseText);
-          const missingMice = [];
-          const mapData = response.treasure_map;
-          if (mapData.goals.mouse.length > 0 && mapData.hunters.length > 0) {
-            const completedIDs = [];
-            mapData.hunters.forEach(el => {
-              const caughtMice = el.completed_goal_ids.mouse;
-              if (caughtMice.length > 0) {
-                caughtMice.forEach(id => completedIDs.push(id));
-              }
-            });
-            mapData.goals.mouse.forEach(el => {
-              if (completedIDs.indexOf(el.unique_id) < 0) {
-                missingMice.push(el.name);
-              }
-            });
-            localStorage.setItem(
-              "tsitu-maptem-mapmice",
-              JSON.stringify(missingMice)
-            );
-            mapTEMCompare();
+    hg.utils.TreasureMapUtil.getMapInfo(mapId, function (response) {
+      const missingMice = [];
+      const mapData = response.treasure_map;
+      if (mapData.goals.mouse.length > 0 && mapData.hunters.length > 0) {
+        const completedIDs = [];
+        mapData.hunters.forEach(el => {
+          const caughtMice = el.completed_goal_ids.mouse;
+          if (caughtMice.length > 0) {
+            caughtMice.forEach(id => completedIDs.push(id));
           }
-        }
-      } catch (error) {
-        console.log("Error while requesting treasure map details");
-        console.error(error.stack);
+        });
+        mapData.goals.mouse.forEach(el => {
+          if (completedIDs.indexOf(el.unique_id) < 0) {
+            missingMice.push(el.name);
+          }
+        });
+        localStorage.setItem(
+          "tsitu-maptem-mapmice",
+          JSON.stringify(missingMice)
+        );
+        mapTEMCompare();
       }
+    }, function (errorResponse) {
+      console.log("Error while requesting treasure map details");
+      console.error(error.stack);
     });
   }
 
@@ -262,8 +261,8 @@
 
     const notifDiv = document.createElement("div");
     notifDiv.className = "notification active";
-    notifDiv.style.left = "300px";
-    notifDiv.style.top = "-55px";
+    notifDiv.style.left = "315px";
+    notifDiv.style.top = "-30px";
     notifDiv.style.background = backgroundColor;
     notifDiv.innerText = mouseList.length || 0;
 
@@ -343,7 +342,7 @@
     masterEl.style.border = "1px";
     masterEl.style.borderStyle = "dotted";
     const masterElLegend = document.createElement("legend");
-    masterElLegend.innerText = "Mapping Helper v2.6.1 by tsitu";
+    masterElLegend.innerText = `Mapping Helper v${GM_info.script.version} by tsitu`;
     masterEl.appendChild(masterElLegend);
 
     /**
@@ -368,7 +367,7 @@
 
     refreshButton.addEventListener("click", function () {
       // Clear cache (is it possible to only do so for just a single map?)
-      hg.controllers.TreasureMap.clearMapCache();
+      hg.controllers.TreasureMapController.clearMapCache();
 
       // Parse map ID
       // Note: Unable to get ID for map currently in preview mode
@@ -383,8 +382,8 @@
       // Close dialog and re-open with either current map or overview
       document.getElementById("jsDialogClose").click();
       mapId === -1
-        ? hg.controllers.TreasureMap.show()
-        : hg.controllers.TreasureMap.show(mapId);
+        ? hg.controllers.TreasureMapController.show()
+        : hg.controllers.TreasureMapController.show(mapId);
     });
 
     refreshSpan.appendChild(refreshButton);
@@ -491,7 +490,7 @@
               if (rawText.length > 0) {
                 const hunterId = parseInt(rawText);
                 if (typeof hunterId === "number" && !isNaN(hunterId)) {
-                  if (hunterId > 0 && hunterId < 9999999) {
+                  if (hunterId > 0 && hunterId < 99999999) {
                     postReq(
                       "https://www.mousehuntgame.com/managers/ajax/pages/friends.php",
                       `sn=Hitgrab&hg_is_ajax=1&action=community_search_by_id&user_id=${hunterId}&uh=${user.unique_hash}`
@@ -510,26 +509,16 @@
                                 `Are you sure you'd like to invite this hunter?\n\nName: ${data.name}\nTitle: ${data.title_name} (${data.title_percent}%)\nLocation: ${data.environment_name}\nLast Active: ${data.last_active_formatted} ago`
                               )
                             ) {
-                              postReq(
-                                "https://www.mousehuntgame.com/managers/ajax/users/treasuremap.php",
-                                `sn=Hitgrab&hg_is_ajax=1&action=send_invites&map_id=${mapId}&snuids%5B%5D=${data.sn_user_id}&uh=${user.unique_hash}&last_read_journal_entry_id=${lastReadJournalEntryId}`
-                              ).then(res2 => {
-                                let inviteRes = null;
-                                try {
-                                  if (res2) {
-                                    inviteRes = JSON.parse(res2.responseText);
-                                    if (inviteRes.success === 1) {
-                                      refreshButton.click();
-                                    } else {
-                                      alert(
-                                        "Map invite unsuccessful - may be because map is full"
-                                      );
-                                    }
-                                  }
-                                } catch (error2) {
-                                  alert("Error while inviting hunter to map");
-                                  console.error(error2.stack);
+                              hg.utils.TreasureMapUtil.sendInvites(mapId, [data.sn_user_id], function (inviteRes) {
+                                if (inviteRes.success === 1) {
+                                  refreshButton.click();
+                                } else {
+                                  alert(
+                                    "Map invite unsuccessful - may be because map is full"
+                                  );
                                 }
+                              }, function (errorResponse) {
+                                alert("Error while inviting hunter to map");
                               });
                             }
                           } else {
