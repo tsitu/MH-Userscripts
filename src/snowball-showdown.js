@@ -1066,7 +1066,7 @@
         ]
       }
     },
-    "Magical Hat": {
+    "Magical Holiday Hat": {
       default: {
         map: [[0, 1, 1], [0, 1, 1], [1, 1, 1, 1]],
         combos: [
@@ -1144,7 +1144,7 @@
     "Holiday Tree": 6,
     "Festive Wreath": 7,
     "Yule Log": 4,
-    "Magical Hat": 7
+    "Magical Holiday Hat": 7
   };
 
   /**
